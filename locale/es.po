@@ -1,0 +1,67 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:stock.cart,active:"
+msgid "Active"
+msgstr "Activo"
+
+msgctxt "field:stock.cart,basket:"
+msgid "Basket"
+msgstr "Cesta"
+
+msgctxt "field:stock.cart,create_date:"
+msgid "Create Date"
+msgstr "Fecha creación"
+
+msgctxt "field:stock.cart,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:stock.cart,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:stock.cart,name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:stock.cart,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:stock.cart,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:stock.cart,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:stock.shipment.out,basket:"
+msgid "Basket"
+msgstr "Cesta"
+
+msgctxt "field:stock.shipment.out,cart:"
+msgid "Cart"
+msgstr "Carro"
+
+msgctxt "model:ir.action,name:act_stock_cart"
+msgid "Carts"
+msgstr "Carros"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_cart"
+msgid "Carts"
+msgstr "Carros"
+
+msgctxt "model:stock.cart,name:"
+msgid "Stock Cart"
+msgstr "Carro de almacén"
+
+msgctxt "view:stock.cart:"
+msgid "Cart"
+msgstr "Carro"
+
+msgctxt "view:stock.cart:"
+msgid "Carts"
+msgstr "Carros"

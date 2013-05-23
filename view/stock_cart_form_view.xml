@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- This file is part of stock_cart module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<form string="Cart" col="4">
+    <label name="name"/>
+    <field name="name"/>
+    <label name="basket"/>
+    <field name="basket"/>
+    <label name="active"/>
+    <field name="active"/>
+</form>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- This file is part of stock_cart module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook/page/field[@name=&quot;outgoing_moves&quot;]"
+            position="after">
+        <newline/>
+        <group colspan="4" col="6" id="cart">
+            <label name="cart"/>
+            <field name="cart" colspan="3"/>
+            <label name="basket"/>
+            <field name="basket"/>
+        </group>
+    </xpath>
+</data>
