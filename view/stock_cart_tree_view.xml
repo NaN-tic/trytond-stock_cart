@@ -4,7 +4,8 @@ The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <tree string="Carts">
     <field name="name"/>
-    <field name="basket"/>
     <field name="user"/>
+    <field name="rows"/>
+    <field name="columns"/>
     <field name="active"/>
 </tree>

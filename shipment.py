@@ -15,7 +15,8 @@ class StockCart(ModelSQL, ModelView):
     ' Stock Cart'
     __name__ = 'stock.cart'
     name = fields.Char('Name')
-    basket = fields.Integer("Basket")
+    rows = fields.Integer('Rows', help='Number of rows are available in this cart')
+    columns = fields.Integer('Columns', help='Number of columns are available in this cart')
     active = fields.Boolean('Active')
     user = fields.Many2One('res.user', 'User', help='User who working in this cart')
 

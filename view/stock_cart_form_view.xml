@@ -5,10 +5,12 @@ copyright notices and license terms. -->
 <form string="Cart" col="4">
     <label name="name"/>
     <field name="name"/>
-    <label name="basket"/>
-    <field name="basket"/>
     <label name="user"/>
     <field name="user"/>
+    <label name="rows"/>
+    <field name="rows"/>
+    <label name="columns"/>
+    <field name="columns"/>
     <label name="active"/>
     <field name="active"/>
 </form>
