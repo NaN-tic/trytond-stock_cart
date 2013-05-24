@@ -5,5 +5,6 @@ copyright notices and license terms. -->
 <tree string="Carts">
     <field name="name"/>
     <field name="basket"/>
+    <field name="user"/>
     <field name="active"/>
 </tree>

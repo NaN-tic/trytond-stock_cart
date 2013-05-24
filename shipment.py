@@ -17,6 +17,7 @@ class StockCart(ModelSQL, ModelView):
     name = fields.Char('Name')
     basket = fields.Integer("Basket")
     active = fields.Boolean('Active')
+    user = fields.Many2One('res.user', 'User', help='User who working in this cart')
 
     @staticmethod
     def default_active():
