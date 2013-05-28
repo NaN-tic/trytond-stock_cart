@@ -8,9 +8,11 @@ copyright notices and license terms. -->
         <newline/>
         <group colspan="4" col="6" id="cart">
             <label name="cart"/>
-            <field name="cart" colspan="3"/>
-            <label name="basket"/>
-            <field name="basket"/>
+            <field name="cart"/>
+            <label name="cart_user"/>
+            <field name="cart_user"/>
+            <label name="cart_picking"/>
+            <field name="cart_picking"/>
         </group>
     </xpath>
 </data>

@@ -28,4 +28,5 @@ class StockCart(ModelSQL, ModelView):
 class ShipmentOut:
     __name__ = 'stock.shipment.out'
     cart = fields.Many2One('stock.cart', 'Cart')
-    basket = fields.Integer("Basket")
+    cart_user = fields.Many2One('res.user', 'User', help='User who made this picking')
+    cart_picking = fields.Boolean('Picking')
