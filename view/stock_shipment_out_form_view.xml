@@ -11,8 +11,8 @@ copyright notices and license terms. -->
             <field name="cart"/>
             <label name="cart_user"/>
             <field name="cart_user"/>
-            <label name="cart_picking"/>
-            <field name="cart_picking"/>
+            <label name="cart_shipment"/>
+            <field name="cart_shipment"/>
         </group>
     </xpath>
 </data>
