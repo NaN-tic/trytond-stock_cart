@@ -7,6 +7,8 @@ copyright notices and license terms. -->
             position="after">
         <newline/>
         <group colspan="4" col="6" id="cart">
+            <label name="stock_cart"/>
+            <field name="stock_cart"/>
             <label name="cart"/>
             <field name="cart"/>
             <label name="cart_user"/>

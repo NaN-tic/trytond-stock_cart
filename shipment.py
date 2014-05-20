@@ -7,7 +7,7 @@ from logging import getLogger
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-
+from trytond.pyson import Eval
 
 __all__ = [
     'StockCart',
@@ -39,6 +39,7 @@ class StockCart(ModelSQL, ModelView):
 
         shipments = Picking.search([
                 ('state', '=', 'assigned'),
+                ('stock_cart', '=', True),
                 ('cart_user', '=', user),
                 ('cart_shipment', '=', True),
                 ], limit=basket, order='planned_date asc')
@@ -47,7 +48,8 @@ class StockCart(ModelSQL, ModelView):
 
         shipments = Picking.search([
                 ('state', '=', 'assigned'),
-                ('cart_id', '=', False),
+                ('stock_cart', '=', True),
+                ('cart', '=', None),
                 ('cart_shipment', '=', False),
                 ], limit=basket, order='planned_date asc')
         return shipments
@@ -162,10 +164,24 @@ class StockCart(ModelSQL, ModelView):
 
 class ShipmentOut:
     __name__ = 'stock.shipment.out'
-    cart = fields.Many2One('stock.cart', 'Cart')
+    stock_cart = fields.Boolean('Stock Cart',
+        help='Shipment is processing in stock cart')
+    cart = fields.Many2One('stock.cart', 'Cart',
+        states={
+            'invisible': ~Eval('stock_cart', True),
+        },
+        depends=['stock_cart'])
     cart_user = fields.Many2One('res.user', 'User',
+        states={
+            'invisible': ~Eval('stock_cart', True),
+        },
+        depends=['stock_cart'],
         help='User who made this shipment')
-    cart_shipment = fields.Boolean('Picking')
+    cart_shipment = fields.Boolean('Picking',
+        states={
+            'invisible': ~Eval('stock_cart', True),
+        },
+        depends=['stock_cart'])
 
     @classmethod
     def __setup__(cls):
@@ -174,6 +190,10 @@ class ShipmentOut:
                 'not_cart_selected':
                     'Select a cart to get shipments.',
                 })
+
+    @staticmethod
+    def default_stock_cart():
+        return True
 
     @classmethod
     def get_shipments_to_cart(cls, shipments):
