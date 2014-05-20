@@ -2,13 +2,17 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "error:stock.shipment.out:"
+msgid "Select a cart to get shipments."
+msgstr "Selecciona un carro para obtener albaranes"
+
 msgctxt "field:stock.cart,active:"
 msgid "Active"
 msgstr "Activo"
 
-msgctxt "field:stock.cart,basket:"
-msgid "Basket"
-msgstr "Cesta"
+msgctxt "field:stock.cart,columns:"
+msgid "Columns"
+msgstr "Columnas"
 
 msgctxt "field:stock.cart,create_date:"
 msgid "Create Date"
@@ -30,6 +34,14 @@ msgctxt "field:stock.cart,rec_name:"
 msgid "Name"
 msgstr "Nombre"
 
+msgctxt "field:stock.cart,rows:"
+msgid "Rows"
+msgstr "Filas"
+
+msgctxt "field:stock.cart,user:"
+msgid "User"
+msgstr "Usuario"
+
 msgctxt "field:stock.cart,write_date:"
 msgid "Write Date"
 msgstr "Fecha modificación"
@@ -38,13 +50,41 @@ msgctxt "field:stock.cart,write_uid:"
 msgid "Write User"
 msgstr "Usuario modificación"
 
-msgctxt "field:stock.shipment.out,basket:"
-msgid "Basket"
-msgstr "Cesta"
-
 msgctxt "field:stock.shipment.out,cart:"
 msgid "Cart"
 msgstr "Carro"
+
+msgctxt "field:stock.shipment.out,cart_shipment:"
+msgid "Picking"
+msgstr "Albarán"
+
+msgctxt "field:stock.shipment.out,cart_user:"
+msgid "User"
+msgstr "Usuario"
+
+msgctxt "field:stock.shipment.out,stock_cart:"
+msgid "Stock Cart"
+msgstr "Carros"
+
+msgctxt "help:stock.cart,columns:"
+msgid "Number of columns are available in this cart"
+msgstr "Número de columnas disponible en el carro"
+
+msgctxt "help:stock.cart,rows:"
+msgid "Number of rows are available in this cart"
+msgstr "Número de filas disponible en el carro"
+
+msgctxt "help:stock.cart,user:"
+msgid "User who working in this cart"
+msgstr "Usuario que está usando este carro"
+
+msgctxt "help:stock.shipment.out,cart_user:"
+msgid "User who made this shipment"
+msgstr "Usuario que ha empaquetado el albarán"
+
+msgctxt "help:stock.shipment.out,stock_cart:"
+msgid "Shipment is processing in stock cart"
+msgstr "El albarán es procesado en el carro"
 
 msgctxt "model:ir.action,name:act_stock_cart"
 msgid "Carts"
@@ -56,12 +96,4 @@ msgstr "Carros"
 
 msgctxt "model:stock.cart,name:"
 msgid "Stock Cart"
-msgstr "Carro de almacén"
-
-msgctxt "view:stock.cart:"
-msgid "Cart"
 msgstr "Carro"
-
-msgctxt "view:stock.cart:"
-msgid "Carts"
-msgstr "Carros"
