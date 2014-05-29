@@ -74,28 +74,40 @@ class StockCart(ModelSQL, ModelView):
             grid_values['name'] = shipment.name
             for move in shipment.move_lines:
                 product = move.product
-                ean13 = [c for c in product.codes if c.barcode == 'ean13']
-                if not ean13:
+                ean13s = [c for c in product.codes if c.barcode == 'ean13']
+
+                if ean13s:
+                    ean13, = ean13s
+                else:
+                    ean13 = None
                     getLogger('stock_cart').info(
                         'Add an EAN13 on product ID %s.' % (product.id))
-                    continue
-                ean13, = ean13
+
                 locations = [p for p in product.locations]
-                if not locations:
+                if locations:
+                    location, = locations
+                    product_location = '%s-%s-%s' % (
+                            location.loc_rack,
+                            location.loc_row,
+                            location.loc_case,
+                            )
+                else:
+                    location = None
+                    product_location = None
                     getLogger('stock_cart').info(
                         'Add an location on product ID %s.' % (product.id))
-                    continue
-                location, = locations
+
                 values = {
                     'id': product.id,
                     'product_name': product.name,
                     'product_code': product.code,
                     'product_ean13': ean13,
                     'product_qty_available': int(product.quantity),
-                    'product_loc_rack': location.loc_rack,
-                    'product_loc_row': location.loc_row,
-                    'product_loc_case': location.loc_case,
+                    'product_loc_rack': location.loc_rack if location else '',
+                    'product_loc_row': location.loc_row if location else '',
+                    'product_loc_case': location.loc_case if location else '',
                     'product_manufacturer': product.manufacturer.name or '',
+                    'product_location': product_location,
                     'qty': int(move.quantity),
                     'shipment': move.shipment.id,
                     'shipment_name': move.shipment.name,
@@ -147,6 +159,7 @@ class StockCart(ModelSQL, ModelView):
                     'loc_row': prod.get('product_loc_row'),
                     'loc_case': prod.get('product_loc_case'),
                     'manufacturer': prod.get('product_manufacturer'),
+                    'product_location': prod.get('product_location'),
                     'location': prod.get('location'),
                     'shipments': shipments,
                     })
