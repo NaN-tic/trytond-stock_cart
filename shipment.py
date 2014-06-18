@@ -87,9 +87,9 @@ class StockCart(ModelSQL, ModelView):
                 if locations:
                     location, = locations
                     product_location = '%s-%s-%s' % (
-                            location.loc_rack,
-                            location.loc_row,
-                            location.loc_case,
+                            location.loc_rack or '',
+                            location.loc_row or '',
+                            location.loc_case or '',
                             )
                 else:
                     location = None
