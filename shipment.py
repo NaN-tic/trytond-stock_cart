@@ -113,6 +113,7 @@ class StockCart(ModelSQL, ModelView):
                     'shipment_name': move.shipment.name,
                     'location': move.from_location.name,
                     'move': move.id,
+                    'state': move.state,
                     }
                 products.append(values)
                 grid_products.append(values)
@@ -138,6 +139,7 @@ class StockCart(ModelSQL, ModelView):
                     'name': prod.get('shipment_name'),
                     'qty': prod.get('qty'),
                     'move': prod.get('move'),
+                    'state': prod.get('state'),
                     })
 
             add = None
