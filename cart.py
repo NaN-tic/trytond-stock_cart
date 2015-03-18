@@ -77,6 +77,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             })
         cls.__rpc__.update({
             'get_products': RPC(readonly=False),
+            'done_cart': RPC(readonly=False),
             })
 
     @staticmethod
@@ -121,11 +122,13 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     def get_products_by_carts(cls, carts):
         '''
         Return a list with products
-        {PRODUCTID: {'name', 'code': 'shipments': [{'id', 'code', 'quantity'}]}
+        {PRODUCTID: {'name', 'code': 'carts', 'shipments': [{'id', 'code', 'quantity'}]}
         '''
         products = {}
 
-        for shipment in [c.shipment for c in carts]:
+        for cart in carts:
+            shipment = cart.shipment
+
             for move in shipment.outgoing_moves:
                 # update current product because other shipment have same
                 if move.product.id in products:
@@ -133,12 +136,17 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     shipments = products[move.product.id]['shipments']
                     shipments.append([{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}])
                     products[move.product.id]['shipments'] = shipments
+                    # update cart
+                    carts = products[move.product.id]['carts']
+                    carts.append(cart.id)
+                    products[move.product.id]['carts'] = carts
                     # update total quantity
                     quantity = products[move.product.id]['quantity']
                     products[move.product.id]['quantity'] = quantity+move.quantity
                 else:
                     product_info = cls.product_info(move.product)
                     product_info['shipments'] = [{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}]
+                    product_info['carts'] = [cart.id]
                     product_info['quantity'] = move.quantity
                     products[move.product.id] = product_info
         return products
@@ -146,7 +154,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     @classmethod
     def get_products(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
         '''
-        Return a list shipments
+        Return a list shipments - RPC
         @param warehouse: ID warehouse domain to search shipments
         @param state: list. Shipment states to filter
         @param attempts: int. Attempts when table is lock
@@ -208,3 +216,15 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 carts = Carts.create(to_create)
                 return cls.get_products_by_carts(carts)
         return []
+
+    @classmethod
+    def done_cart(cls, carts):
+        '''
+        Done carts - RPC
+        @param carts: ID list
+        '''
+        pool = Pool()
+        Carts = pool.get('stock.shipment.out.cart')
+
+        carts = Carts.browse(carts)
+        Carts.done(carts)
