@@ -4,6 +4,7 @@
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
+from trytond.pyson import Eval, Equal, Not
 from trytond.rpc import RPC
 
 import logging
@@ -111,9 +112,18 @@ class StockCart(ModelSQL, ModelView):
 class StockShipmentOutCart(ModelSQL, ModelView):
     ' Stock Shipment Cart'
     __name__ = 'stock.shipment.out.cart'
-    shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True)
-    cart = fields.Many2One('stock.cart', 'Cart', required=True)
-    user = fields.Many2One('res.user', 'User', required=True)
+    shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
+    cart = fields.Many2One('stock.cart', 'Cart', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
+    user = fields.Many2One('res.user', 'User', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done'),
@@ -130,6 +140,14 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         cls._error_messages.update({
             'shipment_uniq': 'The shipment must be unique!',
             })
+        cls._buttons.update({
+            'done': {
+                'invisible': Eval('state') == 'done',
+                },
+            'draft': {
+                'invisible': Eval('state') == 'draft',
+                },
+            })
 
     @staticmethod
     def default_state():
@@ -144,3 +162,17 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     @staticmethod
     def default_user():
         return Transaction().user
+
+    @classmethod
+    @ModelView.button
+    def done(cls, carts):
+        cls.write(carts, {
+            'state': 'done',
+            })
+
+    @classmethod
+    @ModelView.button
+    def draft(cls, carts):
+        cls.write(carts, {
+            'state': 'draft',
+            })

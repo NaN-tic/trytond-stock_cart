@@ -116,6 +116,25 @@ copyright notices and license terms. -->
             parent="menu_stock_carts"
             action="act_stock_shipment_out_cart"/>
 
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_draft">
+            <field name="name">Draft</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain">[('state','=','draft')]</field>
+            <field name="act_window" ref="act_stock_shipment_out_cart"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_done">
+            <field name="name">Done</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain">[('state','=','done')]</field>
+            <field name="act_window" ref="act_stock_shipment_out_cart"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="999"/>
+            <field name="domain"></field>
+            <field name="act_window" ref="act_stock_shipment_out_cart"/>
+        </record>
+
         <record model="ir.model.access" id="access_stock_shipment_out_cart_admin">
             <field name="model" search="[('model', '=', 'stock.shipment.out.cart')]"/>
             <field name="group" ref="group_stock_cart_manager"/>

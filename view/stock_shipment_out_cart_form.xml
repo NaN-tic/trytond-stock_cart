@@ -5,10 +5,18 @@ copyright notices and license terms. -->
 <form string="Cart" col="4">
     <label name="shipment"/>
     <field name="shipment"/>
-    <label name="cart"/>
-    <field name="cart"/>
-    <label name="user"/>
-    <field name="user"/>
+    <notebook colspan="6">
+        <page string="General" id="general" col="6">
+            <label name="cart"/>
+            <field name="cart"/>
+            <label name="user"/>
+            <field name="user"/>
+        </page>
+    </notebook>
     <label name="state"/>
     <field name="state"/>
+    <group col="4" colspan="3" id="buttons">
+        <button name="done" string="Done" icon="tryton-go-next"/>
+        <button name="draft" string="Draft" icon="tryton-clear"/>
+    </group>
 </form>
