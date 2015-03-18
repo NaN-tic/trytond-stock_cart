@@ -1,13 +1,9 @@
 # This file is part of stock_cart module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from json import dumps, loads
-from logging import getLogger
-
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.pyson import Eval
 
 __all__ = ['StockCart']
 __metaclass__ = PoolMeta
