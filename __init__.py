@@ -4,9 +4,7 @@
 from trytond.pool import Pool
 from .shipment import *
 
-
 def register():
     Pool.register(
         StockCart,
-        ShipmentOut,
         module='stock_cart', type_='model')

@@ -17,6 +17,7 @@ copyright notices and license terms. -->
             <field name="priority" eval="30"/>
             <field name="name">stock_cart_form</field>
         </record>
+
         <record model="ir.action.act_window" id="act_stock_cart">
             <field name="name">Carts</field>
             <field name="res_model">stock.cart</field>
@@ -38,6 +39,7 @@ copyright notices and license terms. -->
             name="Carts"
             parent="stock.menu_configuration"
             action="act_stock_cart"/>
+
         <record model="ir.model.access" id="access_configuration">
             <field name="model" search="[('model', '=', 'stock.cart')]"/>
             <field name="perm_read" eval="True"/>
@@ -52,18 +54,6 @@ copyright notices and license terms. -->
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
-        </record>
-
-        <!-- stock.shipment.out -->
-        <record model="ir.ui.view" id="shipment_out_view_tree">
-            <field name="model">stock.shipment.out</field>
-            <field name="inherit" ref="stock.shipment_out_view_tree"/>
-            <field name="name">stock_shipment_out_tree</field>
-        </record>
-        <record model="ir.ui.view" id="shipment_out_view_form">
-            <field name="model">stock.shipment.out</field>
-            <field name="inherit" ref="stock.shipment_out_view_form"/>
-            <field name="name">stock_shipment_out_form</field>
         </record>
     </data>
 </tryton>
