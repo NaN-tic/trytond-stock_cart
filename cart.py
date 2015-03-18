@@ -114,7 +114,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         Return a dict with product info fields
         '''
         return {
-            'name': product.name if product.name else product.template.name,
+            'name': product.name,
             'code': product.code,
             }
 
