@@ -8,5 +8,6 @@ from .user import *
 def register():
     Pool.register(
         StockCart,
+        StockShipmentOutCart,
         User,
         module='stock_cart', type_='model')

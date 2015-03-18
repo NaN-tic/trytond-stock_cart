@@ -4,6 +4,29 @@ The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <tryton>
     <data>
+        <!-- Groups -->
+        <record model="res.group" id="group_stock_cart_manager">
+            <field name="name">Stock Cart Manager</field>
+        </record>
+        <record model="res.group" id="group_stock_cart">
+            <field name="name">Stock Cart</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_stock_cart_manager">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_stock_cart_manager"/>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_stock_cart">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_stock_cart"/>
+        </record>
+
+        <!-- Main Menu -->
+        <menuitem parent="stock.menu_stock" name="Carts" id="menu_stock_carts"/>
+        <record model="ir.ui.menu-res.group" id="menu_stock_carts_group_stock_cart">
+            <field name="menu" ref="menu_stock_carts"/>
+            <field name="group" ref="group_stock_cart"/>
+        </record>
+
         <!-- stock.cart -->
         <record model="ir.ui.view" id="stock_cart_tree_view">
             <field name="model">stock.cart</field>
@@ -40,20 +63,75 @@ copyright notices and license terms. -->
             parent="stock.menu_configuration"
             action="act_stock_cart"/>
 
-        <record model="ir.model.access" id="access_configuration">
+        <record model="ir.model.access" id="access_stock_cart_admin">
             <field name="model" search="[('model', '=', 'stock.cart')]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_delete" eval="False"/>
-        </record>
-        <record model="ir.model.access" id="access_configuration_admin">
-            <field name="model" search="[('model', '=', 'stock.cart')]"/>
-            <field name="group" ref="stock.group_stock_admin"/>
+            <field name="group" ref="group_stock_cart_manager"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+        <record model="ir.model.access" id="access_stock_cart">
+            <field name="model" search="[('model', '=', 'stock.cart')]"/>
+            <field name="group" ref="group_stock_cart"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <!-- stock.shipment.out.cart -->
+        <record model="ir.ui.view" id="stock_shipment_out_cart_tree_view">
+            <field name="model">stock.shipment.out.cart</field>
+            <field name="type">tree</field>
+            <field name="priority" eval="30"/>
+            <field name="name">stock_shipment_out_cart_tree</field>
+        </record>
+        <record model="ir.ui.view" id="stock_shipment_out_cart_form_view">
+            <field name="model">stock.shipment.out.cart</field>
+            <field name="type">form</field>
+            <field name="priority" eval="30"/>
+            <field name="name">stock_shipment_out_cart_form</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_stock_shipment_out_cart">
+            <field name="name">Carts</field>
+            <field name="res_model">stock.shipment.out.cart</field>
+            <field name="domain"></field>
+            <field name="search_value"></field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_stock_shipment_out_cart_tree">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="stock_shipment_out_cart_tree_view"/>
+            <field name="act_window" ref="act_stock_shipment_out_cart"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_stock_shipment_out_cart_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="stock_shipment_out_cart_form_view"/>
+            <field name="act_window" ref="act_stock_shipment_out_cart"/>
+        </record>
+        <menuitem
+            id="menu_stock_shipment_out_cart"
+            name="Shipments Out"
+            parent="menu_stock_carts"
+            action="act_stock_shipment_out_cart"/>
+
+        <record model="ir.model.access" id="access_stock_shipment_out_cart_admin">
+            <field name="model" search="[('model', '=', 'stock.shipment.out.cart')]"/>
+            <field name="group" ref="group_stock_cart_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_sstock_shipment_out_tock_cart">
+            <field name="model" search="[('model', '=', 'stock.shipment.out.cart')]"/>
+            <field name="group" ref="group_stock_cart"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
     </data>
 </tryton>

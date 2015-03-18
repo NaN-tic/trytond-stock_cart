@@ -5,7 +5,7 @@ from trytond.model import ModelView, ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 
-__all__ = ['StockCart']
+__all__ = ['StockCart', 'StockShipmentOutCart']
 __metaclass__ = PoolMeta
 
 
@@ -52,3 +52,29 @@ class StockCart(ModelSQL, ModelView):
                 ('cart_shipment', '=', False),
                 ], limit=basket, order='planned_date asc')
         return shipments
+
+
+class StockShipmentOutCart(ModelSQL, ModelView):
+    ' Stock Shipment Cart'
+    __name__ = 'stock.shipment.out.cart'
+    shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True)
+    cart = fields.Many2One('stock.cart', 'Cart', required=True)
+    user = fields.Many2One('res.user', 'User', required=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('done', 'Done'),
+        ], 'State', readonly=True)
+
+    @staticmethod
+    def default_state():
+        return 'draft'
+
+    @staticmethod
+    def default_cart():
+        User = Pool().get('res.user')
+        user = User(Transaction().user)
+        return user.cart.id if user.cart else None
+
+    @staticmethod
+    def default_user():
+        return Transaction().user
