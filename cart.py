@@ -23,13 +23,6 @@ class StockCart(ModelSQL, ModelView):
         help='Number of columns are available in this cart')
     active = fields.Boolean('Active')
 
-    @classmethod
-    def __setup__(cls):
-        super(StockCart, cls).__setup__()
-        cls.__rpc__.update({
-            'get_shipments': RPC(readonly=False),
-            })
-
     @staticmethod
     def default_active():
         return True
@@ -41,6 +34,78 @@ class StockCart(ModelSQL, ModelView):
     @staticmethod
     def default_columns():
         return 1
+
+
+class StockShipmentOutCart(ModelSQL, ModelView):
+    ' Stock Shipment Cart'
+    __name__ = 'stock.shipment.out.cart'
+    shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
+    cart = fields.Many2One('stock.cart', 'Cart', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
+    user = fields.Many2One('res.user', 'User', required=True,
+        states={
+            'readonly': Not(Equal(Eval('state'), 'draft')),
+        }, depends=['state'])
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('done', 'Done'),
+        ], 'State', readonly=True)
+
+    @classmethod
+    def __setup__(cls):
+        super(StockShipmentOutCart, cls).__setup__()
+        cls._sql_constraints += [
+            ('shipment_uniq', 'UNIQUE(shipment)',
+                'The shipment must be unique!'),
+            ]
+        cls._order.insert(0, ('shipment', 'DESC'))
+        cls._error_messages.update({
+            'shipment_uniq': 'The shipment must be unique!',
+            })
+        cls._buttons.update({
+            'done': {
+                'invisible': Eval('state') == 'done',
+                },
+            'draft': {
+                'invisible': Eval('state') == 'draft',
+                },
+            })
+        cls.__rpc__.update({
+            'get_shipments': RPC(readonly=False),
+            })
+
+    @staticmethod
+    def default_state():
+        return 'draft'
+
+    @staticmethod
+    def default_cart():
+        User = Pool().get('res.user')
+        user = User(Transaction().user)
+        return user.cart.id if user.cart else None
+
+    @staticmethod
+    def default_user():
+        return Transaction().user
+
+    @classmethod
+    @ModelView.button
+    def done(cls, carts):
+        cls.write(carts, {
+            'state': 'done',
+            })
+
+    @classmethod
+    @ModelView.button
+    def draft(cls, carts):
+        cls.write(carts, {
+            'state': 'draft',
+            })
 
     @classmethod
     def get_shipments(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
@@ -92,7 +157,7 @@ class StockCart(ModelSQL, ModelView):
             # Assign new shipments
             shipments = [s.id for s in Shipment.search(domain, order=[('planned_date', 'ASC')])]
 
-            carts_assigned = [c.id for c in Carts.search([
+            carts_assigned = [c.shipment.id for c in Carts.search([
                 ('shipment', 'in', shipments),
                 ])]
 
@@ -107,72 +172,3 @@ class StockCart(ModelSQL, ModelView):
                 carts = Carts.create(to_create)
                 return carts
         return []
-
-
-class StockShipmentOutCart(ModelSQL, ModelView):
-    ' Stock Shipment Cart'
-    __name__ = 'stock.shipment.out.cart'
-    shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
-    cart = fields.Many2One('stock.cart', 'Cart', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
-    user = fields.Many2One('res.user', 'User', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('done', 'Done'),
-        ], 'State', readonly=True)
-
-    @classmethod
-    def __setup__(cls):
-        super(StockShipmentOutCart, cls).__setup__()
-        cls._sql_constraints += [
-            ('shipment_uniq', 'UNIQUE(shipment)',
-                'The shipment must be unique!'),
-            ]
-        cls._order.insert(0, ('shipment', 'DESC'))
-        cls._error_messages.update({
-            'shipment_uniq': 'The shipment must be unique!',
-            })
-        cls._buttons.update({
-            'done': {
-                'invisible': Eval('state') == 'done',
-                },
-            'draft': {
-                'invisible': Eval('state') == 'draft',
-                },
-            })
-
-    @staticmethod
-    def default_state():
-        return 'draft'
-
-    @staticmethod
-    def default_cart():
-        User = Pool().get('res.user')
-        user = User(Transaction().user)
-        return user.cart.id if user.cart else None
-
-    @staticmethod
-    def default_user():
-        return Transaction().user
-
-    @classmethod
-    @ModelView.button
-    def done(cls, carts):
-        cls.write(carts, {
-            'state': 'done',
-            })
-
-    @classmethod
-    @ModelView.button
-    def draft(cls, carts):
-        cls.write(carts, {
-            'state': 'draft',
-            })
