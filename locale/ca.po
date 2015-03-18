@@ -2,9 +2,13 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:stock.shipment.out:"
-msgid "Select a cart to get shipments."
-msgstr "Selecciona un carro per obtenir albarans."
+msgctxt "error:stock.shipment.out.cart:"
+msgid "The shipment must be unique!"
+msgstr "L'albarà ha de ser únic."
+
+msgctxt "field:res.user,cart:"
+msgid "Cart"
+msgstr "Cistella"
 
 msgctxt "field:stock.cart,active:"
 msgid "Active"
@@ -38,10 +42,6 @@ msgctxt "field:stock.cart,rows:"
 msgid "Rows"
 msgstr "Files"
 
-msgctxt "field:stock.cart,user:"
-msgid "User"
-msgstr "Usuari"
-
 msgctxt "field:stock.cart,write_date:"
 msgid "Write Date"
 msgstr "Data modificació"
@@ -50,50 +50,137 @@ msgctxt "field:stock.cart,write_uid:"
 msgid "Write User"
 msgstr "Usuari modificació"
 
-msgctxt "field:stock.shipment.out,cart:"
+msgctxt "field:stock.shipment.out.cart,cart:"
 msgid "Cart"
-msgstr "Carro"
+msgstr "Cistella"
 
-msgctxt "field:stock.shipment.out,cart_shipment:"
-msgid "Picking"
-msgstr "Albarà"
+msgctxt "field:stock.shipment.out.cart,create_date:"
+msgid "Create Date"
+msgstr "Data creació"
 
-msgctxt "field:stock.shipment.out,cart_user:"
+msgctxt "field:stock.shipment.out.cart,create_uid:"
+msgid "Create User"
+msgstr "Usuari creació"
+
+msgctxt "field:stock.shipment.out.cart,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:stock.shipment.out.cart,rec_name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:stock.shipment.out.cart,shipment:"
+msgid "Shipment"
+msgstr "Enviaments"
+
+msgctxt "field:stock.shipment.out.cart,state:"
+msgid "State"
+msgstr "Estat"
+
+msgctxt "field:stock.shipment.out.cart,user:"
 msgid "User"
 msgstr "Usuari"
 
-msgctxt "field:stock.shipment.out,stock_cart:"
-msgid "Stock Cart"
-msgstr "Carro"
+msgctxt "field:stock.shipment.out.cart,write_date:"
+msgid "Write Date"
+msgstr "Data modificació"
+
+msgctxt "field:stock.shipment.out.cart,write_uid:"
+msgid "Write User"
+msgstr "Usuari modificació"
 
 msgctxt "help:stock.cart,columns:"
 msgid "Number of columns are available in this cart"
-msgstr "Número de columnes disponible en aquest carro"
+msgstr "Número columnes disponibles a la cistella."
 
 msgctxt "help:stock.cart,rows:"
 msgid "Number of rows are available in this cart"
-msgstr "Número de files disponible en aquest carro"
-
-msgctxt "help:stock.cart,user:"
-msgid "User who working in this cart"
-msgstr "Usuari que està treballant amb aquest carro"
-
-msgctxt "help:stock.shipment.out,cart_user:"
-msgid "User who made this shipment"
-msgstr "Usuari qui ha empaquetat aquest albarà"
-
-msgctxt "help:stock.shipment.out,stock_cart:"
-msgid "Shipment is processing in stock cart"
-msgstr "L'albarà es procesa en el sistema del carret"
+msgstr "Número files disponibles a la cistella."
 
 msgctxt "model:ir.action,name:act_stock_cart"
 msgid "Carts"
-msgstr "Carros"
+msgstr "Cistelles"
+
+msgctxt "model:ir.action,name:act_stock_shipment_out_cart"
+msgid "Carts"
+msgstr "Cistelles"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_all"
+msgid "All"
+msgstr "Tots"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_done"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_draft"
+msgid "Draft"
+msgstr "Esborrany"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_cart"
 msgid "Carts"
-msgstr "Carros"
+msgstr "Cistelles"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_carts"
+msgid "Carts"
+msgstr "Cistelles"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart"
+msgid "Shipments Out"
+msgstr "Albará sortida"
+
+msgctxt "model:res.group,name:group_stock_cart"
+msgid "Stock Cart"
+msgstr "Cistelles Magatzem"
+
+msgctxt "model:res.group,name:group_stock_cart_manager"
+msgid "Stock Cart Manager"
+msgstr "Gestor Cistelles Magatzem"
 
 msgctxt "model:stock.cart,name:"
 msgid "Stock Cart"
-msgstr "Carro"
+msgstr "Cistelles Magatzem"
+
+msgctxt "model:stock.shipment.out.cart,name:"
+msgid "Stock Shipment Cart"
+msgstr "Albará sortida cistella"
+
+msgctxt "selection:stock.shipment.out.cart,state:"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt "selection:stock.shipment.out.cart,state:"
+msgid "Draft"
+msgstr "Esborrany"
+
+msgctxt "view:stock.cart:"
+msgid "Cart"
+msgstr "Cistella"
+
+msgctxt "view:stock.cart:"
+msgid "Carts"
+msgstr "Cistelles"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Cart"
+msgstr "Cistella"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Draft"
+msgstr "Esborrany"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "General"
+msgstr "General"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Shipment Out Cart"
+msgstr "Albará sortida cistella"

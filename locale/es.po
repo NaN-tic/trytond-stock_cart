@@ -2,9 +2,13 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:stock.shipment.out:"
-msgid "Select a cart to get shipments."
-msgstr "Selecciona un carro para obtener albaranes"
+msgctxt "error:stock.shipment.out.cart:"
+msgid "The shipment must be unique!"
+msgstr "El albarán debe ser único."
+
+msgctxt "field:res.user,cart:"
+msgid "Cart"
+msgstr "Cesta"
 
 msgctxt "field:stock.cart,active:"
 msgid "Active"
@@ -38,10 +42,6 @@ msgctxt "field:stock.cart,rows:"
 msgid "Rows"
 msgstr "Filas"
 
-msgctxt "field:stock.cart,user:"
-msgid "User"
-msgstr "Usuario"
-
 msgctxt "field:stock.cart,write_date:"
 msgid "Write Date"
 msgstr "Fecha modificación"
@@ -50,50 +50,137 @@ msgctxt "field:stock.cart,write_uid:"
 msgid "Write User"
 msgstr "Usuario modificación"
 
-msgctxt "field:stock.shipment.out,cart:"
+msgctxt "field:stock.shipment.out.cart,cart:"
 msgid "Cart"
-msgstr "Carro"
+msgstr "Cesta"
 
-msgctxt "field:stock.shipment.out,cart_shipment:"
-msgid "Picking"
-msgstr "Albarán"
+msgctxt "field:stock.shipment.out.cart,create_date:"
+msgid "Create Date"
+msgstr "Fecha creación"
 
-msgctxt "field:stock.shipment.out,cart_user:"
+msgctxt "field:stock.shipment.out.cart,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:stock.shipment.out.cart,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:stock.shipment.out.cart,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:stock.shipment.out.cart,shipment:"
+msgid "Shipment"
+msgstr "Envío"
+
+msgctxt "field:stock.shipment.out.cart,state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "field:stock.shipment.out.cart,user:"
 msgid "User"
 msgstr "Usuario"
 
-msgctxt "field:stock.shipment.out,stock_cart:"
-msgid "Stock Cart"
-msgstr "Carros"
+msgctxt "field:stock.shipment.out.cart,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:stock.shipment.out.cart,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
 
 msgctxt "help:stock.cart,columns:"
 msgid "Number of columns are available in this cart"
-msgstr "Número de columnas disponible en el carro"
+msgstr "Número de columnas disponibles en esta cesta"
 
 msgctxt "help:stock.cart,rows:"
 msgid "Number of rows are available in this cart"
-msgstr "Número de filas disponible en el carro"
-
-msgctxt "help:stock.cart,user:"
-msgid "User who working in this cart"
-msgstr "Usuario que está usando este carro"
-
-msgctxt "help:stock.shipment.out,cart_user:"
-msgid "User who made this shipment"
-msgstr "Usuario que ha empaquetado el albarán"
-
-msgctxt "help:stock.shipment.out,stock_cart:"
-msgid "Shipment is processing in stock cart"
-msgstr "El albarán es procesado en el carro"
+msgstr "Número de filas disponibles en esta cesta"
 
 msgctxt "model:ir.action,name:act_stock_cart"
 msgid "Carts"
-msgstr "Carros"
+msgstr "Cestas"
+
+msgctxt "model:ir.action,name:act_stock_shipment_out_cart"
+msgid "Carts"
+msgstr "Cestas"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_all"
+msgid "All"
+msgstr "Todos"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_done"
+msgid "Done"
+msgstr "Realizado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_draft"
+msgid "Draft"
+msgstr "Borrador"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_cart"
 msgid "Carts"
-msgstr "Carros"
+msgstr "Cestas"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_carts"
+msgid "Carts"
+msgstr "Cesta"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart"
+msgid "Shipments Out"
+msgstr "Albarán salida"
+
+msgctxt "model:res.group,name:group_stock_cart"
+msgid "Stock Cart"
+msgstr "Cestas Almacén"
+
+msgctxt "model:res.group,name:group_stock_cart_manager"
+msgid "Stock Cart Manager"
+msgstr "Gestor Cestas Almacén"
 
 msgctxt "model:stock.cart,name:"
 msgid "Stock Cart"
-msgstr "Carro"
+msgstr "Cestas Almacén"
+
+msgctxt "model:stock.shipment.out.cart,name:"
+msgid "Stock Shipment Cart"
+msgstr "Cestas albarán salida"
+
+msgctxt "selection:stock.shipment.out.cart,state:"
+msgid "Done"
+msgstr "Realizado"
+
+msgctxt "selection:stock.shipment.out.cart,state:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "view:stock.cart:"
+msgid "Cart"
+msgstr "Cestas"
+
+msgctxt "view:stock.cart:"
+msgid "Carts"
+msgstr "Cestas"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Cart"
+msgstr "Cesta"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Done"
+msgstr "Realizado"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "General"
+msgstr "General"
+
+msgctxt "view:stock.shipment.out.cart:"
+msgid "Shipment Out Cart"
+msgstr "Cestas albarán salida"
