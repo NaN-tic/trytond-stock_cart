@@ -76,7 +76,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 },
             })
         cls.__rpc__.update({
-            'get_shipments': RPC(readonly=False),
+            'get_products': RPC(readonly=False),
             })
 
     @staticmethod
@@ -107,8 +107,44 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             'state': 'draft',
             })
 
+    @staticmethod
+    def product_info(product):
+        '''
+        Return a dict with product info fields
+        '''
+        return {
+            'name': product.name if product.name else product.template.name,
+            'code': product.code,
+            }
+
     @classmethod
-    def get_shipments(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
+    def get_products_by_carts(cls, carts):
+        '''
+        Return a list with products
+        {PRODUCTID: {'name', 'code': 'shipments': [{'id', 'code', 'quantity'}]}
+        '''
+        products = {}
+
+        for shipment in [c.shipment for c in carts]:
+            for move in shipment.outgoing_moves:
+                # update current product because other shipment have same
+                if move.product.id in products:
+                    # update shipments + quantity
+                    shipments = products[move.product.id]['shipments']
+                    shipments.append([{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}])
+                    products[move.product.id]['shipments'] = shipments
+                    # update total quantity
+                    quantity = products[move.product.id]['quantity']
+                    products[move.product.id]['quantity'] = quantity+move.quantity
+                else:
+                    product_info = cls.product_info(move.product)
+                    product_info['shipments'] = [{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}]
+                    product_info['quantity'] = move.quantity
+                    products[move.product.id] = product_info
+        return products
+
+    @classmethod
+    def get_products(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
         '''
         Return a list shipments
         @param warehouse: ID warehouse domain to search shipments
@@ -147,12 +183,12 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 return []
         else:
             # if there are carts state draft, return first this carts
-            carts = Carts.search_read([
+            carts = Carts.search([
                 ('state', '=', 'draft'),
                 ('user', '=', user),
                 ], limit=baskets)
             if carts:
-                return carts
+                return cls.get_products_by_carts(carts)
 
             # Assign new shipments
             shipments = [s.id for s in Shipment.search(domain, order=[('planned_date', 'ASC')])]
@@ -166,9 +202,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
 
             # Save carts assigned to user
             to_create = []
-            for s in shipments_cart[:baskets]:
+            for s in shipments_cart[:baskets]: # get limit from baskets
                 to_create.append({'shipment': s})
             if to_create:
                 carts = Carts.create(to_create)
-                return carts
+                return cls.get_products_by_carts(carts)
         return []
