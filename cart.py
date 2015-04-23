@@ -184,7 +184,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         except:
             # Table is locked. Captures operational error and returns void list
             if attempts < total_attempts:
-                cls.get_shipments(state, attempts+1, total_attempts)
+                cls.get_products(warehouse, state, attempts+1, total_attempts)
             else:
                 logging.getLogger('Stock Cart').warning(
                     'Table Carts is lock after %s attempts' % (total_attempts))
