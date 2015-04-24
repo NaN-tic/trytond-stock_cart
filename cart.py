@@ -152,6 +152,10 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         return products
 
     @classmethod
+    def domain_append(cls, domain):
+        pass
+
+    @classmethod
     def get_products(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
         '''
         Return a list shipments - RPC
@@ -166,7 +170,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         User = pool.get('res.user')
 
         transaction = Transaction()
-        user = User(Transaction().user)
+        user = User(transaction.user)
 
         if not user.cart:
             logging.getLogger('Stock Cart').warning(
@@ -177,6 +181,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         domain = [('state', 'in', state)]
         if warehouse:
             domain.append(('warehouse', '=', warehouse))
+        cls.domain_append(domain)
 
         try:
             # Locks transaction. Nobody can query this table
