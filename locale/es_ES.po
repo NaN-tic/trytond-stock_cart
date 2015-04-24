@@ -159,7 +159,7 @@ msgstr "Borrador"
 
 msgctxt "view:stock.cart:"
 msgid "Cart"
-msgstr "Cestas"
+msgstr "Cesta"
 
 msgctxt "view:stock.cart:"
 msgid "Carts"
@@ -183,4 +183,4 @@ msgstr "General"
 
 msgctxt "view:stock.shipment.out.cart:"
 msgid "Shipment Out Cart"
-msgstr "Cestas albarán salida"
+msgstr "Cesta de albarán de salida"
