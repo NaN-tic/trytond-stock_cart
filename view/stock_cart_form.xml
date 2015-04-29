@@ -2,13 +2,17 @@
 <!-- This file is part of stock_cart module for Tryton.
 The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
-<form string="Cart" col="4">
+<form string="Cart">
     <label name="name"/>
     <field name="name"/>
-    <label name="rows"/>
-    <field name="rows"/>
-    <label name="columns"/>
-    <field name="columns"/>
     <label name="active"/>
     <field name="active"/>
+     <group col="6" colspan="2" id="configuration">
+        <label name="rows"/>
+        <field name="rows"/>
+        <label name="columns"/>
+        <field name="columns"/>
+        <label name="total"/>
+        <field name="total"/>
+    </group>
 </form>

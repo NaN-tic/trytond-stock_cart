@@ -21,6 +21,8 @@ class StockCart(ModelSQL, ModelView):
         help='Number of rows are available in this cart')
     columns = fields.Integer('Columns', required=True,
         help='Number of columns are available in this cart')
+    total = fields.Function(fields.Integer('Total',
+        help='Total boxes (rows * columns)'), 'on_change_with_total')
     active = fields.Boolean('Active')
 
     @staticmethod
@@ -34,6 +36,12 @@ class StockCart(ModelSQL, ModelView):
     @staticmethod
     def default_columns():
         return 1
+
+    @fields.depends('rows', 'columns')
+    def on_change_with_total(self, name=None):
+        if self.rows and self.columns:
+            return self.rows * self.columns
+        return 0
 
 
 class StockShipmentOutCart(ModelSQL, ModelView):
