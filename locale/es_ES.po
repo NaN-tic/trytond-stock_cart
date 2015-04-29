@@ -8,7 +8,7 @@ msgstr "El albarán debe ser único."
 
 msgctxt "field:res.user,cart:"
 msgid "Cart"
-msgstr "Cesta"
+msgstr "Carro"
 
 msgctxt "field:stock.cart,active:"
 msgid "Active"
@@ -42,6 +42,10 @@ msgctxt "field:stock.cart,rows:"
 msgid "Rows"
 msgstr "Filas"
 
+msgctxt "field:stock.cart,total:"
+msgid "Total"
+msgstr "Total"
+
 msgctxt "field:stock.cart,write_date:"
 msgid "Write Date"
 msgstr "Fecha modificación"
@@ -52,7 +56,7 @@ msgstr "Usuario modificación"
 
 msgctxt "field:stock.shipment.out.cart,cart:"
 msgid "Cart"
-msgstr "Cesta"
+msgstr "Carro"
 
 msgctxt "field:stock.shipment.out.cart,create_date:"
 msgid "Create Date"
@@ -98,13 +102,17 @@ msgctxt "help:stock.cart,rows:"
 msgid "Number of rows are available in this cart"
 msgstr "Número de filas disponibles en esta cesta"
 
+msgctxt "help:stock.cart,total:"
+msgid "Total boxes (rows * columns)"
+msgstr "Total cestas (filas * columnas)"
+
 msgctxt "model:ir.action,name:act_stock_cart"
 msgid "Carts"
-msgstr "Cestas"
+msgstr "Carros"
 
 msgctxt "model:ir.action,name:act_stock_shipment_out_cart"
 msgid "Carts"
-msgstr "Cestas"
+msgstr "Carros"
 
 msgctxt ""
 "model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_all"
@@ -123,11 +131,11 @@ msgstr "Borrador"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_cart"
 msgid "Carts"
-msgstr "Cestas"
+msgstr "Carros"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_carts"
 msgid "Carts"
-msgstr "Cesta"
+msgstr "Carros"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart"
 msgid "Shipments Out"
@@ -159,15 +167,15 @@ msgstr "Borrador"
 
 msgctxt "view:stock.cart:"
 msgid "Cart"
-msgstr "Cesta"
+msgstr "Carro"
 
 msgctxt "view:stock.cart:"
 msgid "Carts"
-msgstr "Cestas"
+msgstr "Carros"
 
 msgctxt "view:stock.shipment.out.cart:"
 msgid "Cart"
-msgstr "Cesta"
+msgstr "Carro"
 
 msgctxt "view:stock.shipment.out.cart:"
 msgid "Done"
