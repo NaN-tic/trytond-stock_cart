@@ -142,7 +142,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 if move.product.id in products:
                     # update shipments + quantity
                     shipments = products[move.product.id]['shipments']
-                    shipments.append([{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}])
+                    shipments.append({'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity})
                     products[move.product.id]['shipments'] = shipments
                     # update cart
                     carts = products[move.product.id]['carts']
