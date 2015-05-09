@@ -231,16 +231,25 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         return []
 
     @classmethod
-    def done_cart(cls, carts):
+    def done_cart(cls, shipments):
         '''
         Done carts - RPC
-        @param carts: ID list
+        @param shipments: list codes
         '''
         pool = Pool()
         Carts = pool.get('stock.shipment.out.cart')
+        ShipmentOut = pool.get('stock.shipment.out')
 
-        carts = Carts.browse(carts)
-        Carts.done(carts)
+        shipments = ShipmentOut.search([
+                ('code', 'in', shipments),
+                ])
+
+        if shipments:
+            carts = Carts.search([
+                ('state', '=', 'draft'),
+                ('shipment', 'in', shipments),
+                ])
+            Carts.done(carts)
 
     @classmethod
     def print_shipments(cls, shipments):
