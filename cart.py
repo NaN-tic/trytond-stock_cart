@@ -241,3 +241,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
 
         carts = Carts.browse(carts)
         Carts.done(carts)
+
+    @classmethod
+    def print_shipments(cls, shipments):
+        '''Custome print shipment method'''
+        return
