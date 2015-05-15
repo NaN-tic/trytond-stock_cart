@@ -129,35 +129,67 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     @classmethod
     def get_products_by_carts(cls, carts):
         '''
-        Return a list with products
-        {PRODUCTID: {'name', 'code': 'carts', 'shipments': [{'id', 'code', 'quantity'}]}
+        Return a list of dictionaries like this:
+        [{
+                product_id: {
+                    'name': name_value,
+                    'code': code_value,
+                    'carts': [
+                        cart_id,
+                        ],
+                    'shipments': [{
+                            'id': shipment_id,
+                            'code': code_value,
+                            'quantity': quantity_value,
+                            },
+                        ]}},
+            ]
+        Where products are sorted by location path
         '''
-        products = {}
-
+        Location = Pool().get('stock.location')
+        location, = Location.search([], limit=1, order=[('sequence', 'DESC')])
+        last_sequence = location.sequence or 0
+        products = []
         for cart in carts:
             shipment = cart.shipment
+            for move in shipment.inventory_moves:
+                # If location has not sequence, put it in the end
+                sequence = move.from_location.sequence or last_sequence + 1
+                index = len(products)
+                while index > 0 and products[index - 1][0] > sequence:
+                    index -= 1
 
-            for move in shipment.outgoing_moves:
-                # update current product because other shipment have same
-                if move.product.id in products:
-                    # update shipments + quantity
-                    shipments = products[move.product.id]['shipments']
-                    shipments.append({'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity})
-                    products[move.product.id]['shipments'] = shipments
-                    # update cart
-                    carts = products[move.product.id]['carts']
-                    carts.append(cart.id)
-                    products[move.product.id]['carts'] = carts
-                    # update total quantity
-                    quantity = products[move.product.id]['quantity']
-                    products[move.product.id]['quantity'] = quantity+move.quantity
+                jindex = index
+                while (jindex > 0
+                        # Check if different products have the same sequence
+                        and move.product.id not in products[jindex - 1][1]):
+                    jindex -= 1
+                if jindex <= 0:
+                    # Append this product to the list
+                    product = cls.product_info(move.product)
+                    product['shipments'] = [{
+                            'id': shipment.id,
+                            'code': shipment.code,
+                            'quantity': move.quantity
+                            }]
+                    product['carts'] = [cart.id]
+                    product['quantity'] = move.quantity
+                    products.insert(index, (sequence,
+                            {move.product.id: product}))
                 else:
-                    product_info = cls.product_info(move.product)
-                    product_info['shipments'] = [{'id': shipment.id, 'code': shipment.code, 'quantity': move.quantity}]
-                    product_info['carts'] = [cart.id]
-                    product_info['quantity'] = move.quantity
-                    products[move.product.id] = product_info
-        return products
+                    index = jindex
+                    # Update current product because is already in the list
+                    product = products[index - 1][1][move.product.id]
+
+                    product['shipments'].append({
+                                'id': shipment.id,
+                                'code': shipment.code,
+                                'quantity': move.quantity
+                                })
+                    product['carts'].append(cart.id)
+                    product['quantity'] += move.quantity
+
+        return [p[1] for p in products]
 
     @classmethod
     def domain_append(cls, domain):
