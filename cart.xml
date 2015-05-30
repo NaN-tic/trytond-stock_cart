@@ -112,7 +112,7 @@ copyright notices and license terms. -->
         </record>
         <menuitem
             id="menu_stock_shipment_out_cart"
-            name="Shipments Out"
+            name="Customer Shipments"
             parent="menu_stock_carts"
             action="act_stock_shipment_out_cart"/>
 

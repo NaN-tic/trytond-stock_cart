@@ -138,8 +138,8 @@ msgid "Carts"
 msgstr "Carros"
 
 msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart"
-msgid "Shipments Out"
-msgstr "Albarán salida"
+msgid "Customer Shipments"
+msgstr "Albaranes cliente"
 
 msgctxt "model:res.group,name:group_stock_cart"
 msgid "Stock Cart"
