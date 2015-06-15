@@ -244,14 +244,16 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 return cls.get_products_by_carts(carts)
 
             # Assign new shipments
-            shipments = [s.id for s in Shipment.search(domain, order=[('planned_date', 'ASC')])]
+            pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
+                if s.carrier else 999} for s in Shipment.search(domain)]
+            shipments = [s['id'] for s in sorted(pickings, key=lambda k: k['sequence'])]
 
             carts_assigned = [c.shipment.id for c in Carts.search([
                 ('shipment', 'in', shipments),
                 ])]
 
-            #TODO. Respect order shipments
-            shipments_cart = list(set(shipments) - set(carts_assigned))
+            # Respect shipments order
+            shipments_cart = [s for s in shipments if s not in carts_assigned]
 
             # Save carts assigned to user
             to_create = []
