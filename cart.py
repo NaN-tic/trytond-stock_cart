@@ -6,11 +6,12 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, Equal, Not
 from trytond.rpc import RPC
-
 import logging
 
 __all__ = ['StockCart', 'StockShipmentOutCart']
 __metaclass__ = PoolMeta
+
+logger = logging.getLogger(__name__)
 
 
 class StockCart(ModelSQL, ModelView):
@@ -213,7 +214,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         user = User(transaction.user)
 
         if not user.cart:
-            logging.getLogger('Stock Cart').warning(
+            logger.warning(
                 'User %s not have cart in their preferences' % user.rec_name)
             return []
         baskets = user.cart.rows * user.cart.columns
@@ -231,7 +232,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             if attempts < total_attempts:
                 cls.get_products(warehouse, state, attempts+1, total_attempts)
             else:
-                logging.getLogger('Stock Cart').warning(
+                logger.warning(
                     'Table Carts is lock after %s attempts' % (total_attempts))
                 return []
         else:
