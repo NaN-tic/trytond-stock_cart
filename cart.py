@@ -196,6 +196,10 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         pass
 
     @classmethod
+    def filter_shipments(cls, shipments):
+        return shipments
+
+    @classmethod
     def get_products(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
         '''
         Return a list shipments - RPC
@@ -243,9 +247,12 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             if carts:
                 return cls.get_products_by_carts(carts)
 
+            shipments = Shipment.search(domain)
+            shipments = cls.filter_shipments(shipments)
+
             # Assign new shipments
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
-                if s.carrier else 999} for s in Shipment.search(domain)]
+                if s.carrier else 999} for s in shipments]
             shipments = [s['id'] for s in sorted(pickings, key=lambda k: k['sequence'])]
 
             carts_assigned = [c.shipment.id for c in Carts.search([
