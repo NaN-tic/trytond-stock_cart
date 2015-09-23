@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -76,7 +76,7 @@ msgstr "Nom"
 
 msgctxt "field:stock.shipment.out.cart,shipment:"
 msgid "Shipment"
-msgstr "Enviaments"
+msgstr "Albarà"
 
 msgctxt "field:stock.shipment.out.cart,state:"
 msgid "State"
