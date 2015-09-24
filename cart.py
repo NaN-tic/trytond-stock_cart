@@ -48,6 +48,7 @@ class StockCart(ModelSQL, ModelView):
 class StockShipmentOutCart(ModelSQL, ModelView):
     ' Stock Shipment Cart'
     __name__ = 'stock.shipment.out.cart'
+    _rec_name = 'shipment'
     shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True,
         states={
             'readonly': Not(Equal(Eval('state'), 'draft')),
