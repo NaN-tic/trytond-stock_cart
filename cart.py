@@ -75,9 +75,6 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 'The shipment must be unique!'),
             ]
         cls._order.insert(0, ('shipment', 'DESC'))
-        cls._error_messages.update({
-            'shipment_uniq': 'The shipment must be unique!',
-            })
         cls._buttons.update({
             'done': {
                 'invisible': Eval('state') == 'done',
