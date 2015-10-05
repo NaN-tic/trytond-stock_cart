@@ -247,7 +247,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             if carts:
                 return cls.get_products_by_carts(carts)
 
-            shipments = Shipment.search(domain)
+            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
             shipments = cls.filter_shipments(shipments)
 
             # Assign new shipments
