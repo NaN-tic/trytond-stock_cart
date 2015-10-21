@@ -170,7 +170,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     product['shipments'] = [{
                             'id': shipment.id,
                             'code': shipment.code,
-                            'quantity': move.quantity
+                            'quantity': move.quantity,
+                            'location': move.from_location.rec_name,
                             }]
                     product['carts'] = [cart.id]
                     product['quantity'] = move.quantity
@@ -184,7 +185,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     product['shipments'].append({
                                 'id': shipment.id,
                                 'code': shipment.code,
-                                'quantity': move.quantity
+                                'quantity': move.quantity,
+                                'location': move.from_location.rec_name,
                                 })
                     product['carts'].append(cart.id)
                     product['quantity'] += move.quantity
