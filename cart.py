@@ -164,6 +164,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                         # Check if different products have the same sequence
                         and move.product.id not in products[jindex - 1][1]):
                     jindex -= 1
+
+                location = move.from_location.rec_name
                 if jindex <= 0:
                     # Append this product to the list
                     product = cls.product_info(move.product)
@@ -171,25 +173,32 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                             'id': shipment.id,
                             'code': shipment.code,
                             'quantity': move.quantity,
-                            'location': move.from_location.rec_name,
+                            'location': location,
                             }]
                     product['carts'] = [cart.id]
                     product['quantity'] = move.quantity
+                    locations = product.get('locations', [])
+                    if not location in locations:
+                        locations.append(location)
+                    product['locations'] = locations
                     products.insert(index, (sequence,
                             {move.product.id: product}))
                 else:
                     index = jindex
                     # Update current product because is already in the list
                     product = products[index - 1][1][move.product.id]
-
                     product['shipments'].append({
                                 'id': shipment.id,
                                 'code': shipment.code,
                                 'quantity': move.quantity,
-                                'location': move.from_location.rec_name,
+                                'location': location,
                                 })
                     product['carts'].append(cart.id)
                     product['quantity'] += move.quantity
+                    locations = product.get('locations', [])
+                    if not location in locations:
+                        locations.append(location)
+                    product['locations'] = locations
 
         return [p[1] for p in products]
 
