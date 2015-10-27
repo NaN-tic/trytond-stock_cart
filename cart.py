@@ -2,7 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 from time import sleep
-from trytond.model import ModelView, ModelSQL, fields
+from trytond.model import ModelView, ModelSQL, fields, Unique
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, Equal, Not
@@ -251,6 +251,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             else:
                 logger.warning(
                     'Table Carts is lock after %s attempts' % (total_attempts))
+                return []
         else:
             # if there are carts state draft, return first this carts
             carts = Carts.search([
