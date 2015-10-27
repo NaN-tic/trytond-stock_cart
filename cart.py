@@ -251,6 +251,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             else:
                 logging.getLogger('Stock Cart').warning(
                     'Table Carts is lock after %s attempts' % (total_attempts))
+                return []
         else:
             # if there are carts state draft, return first this carts
             carts = Carts.search([
