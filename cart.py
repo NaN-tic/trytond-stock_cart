@@ -1,7 +1,8 @@
 # This file is part of stock_cart module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from trytond.model import ModelView, ModelSQL, fields, Unique
+from time import sleep
+from trytond.model import ModelView, ModelSQL, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, Equal, Not
@@ -244,11 +245,12 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         except:
             # Table is locked. Captures operational error and returns void list
             if attempts < total_attempts:
-                cls.get_products(warehouse, state, attempts+1, total_attempts)
+                sleep(0.5)
+                return cls.get_products(warehouse, state, attempts + 1,
+                    total_attempts)
             else:
                 logger.warning(
                     'Table Carts is lock after %s attempts' % (total_attempts))
-                return []
         else:
             # if there are carts state draft, return first this carts
             carts = Carts.search([
