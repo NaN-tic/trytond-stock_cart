@@ -154,6 +154,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         for cart in carts:
             shipment = cart.shipment
             for move in shipment.inventory_moves:
+                if move.state != 'assigned':
+                    continue
                 # If location has not sequence, put it in the end
                 sequence = move.from_location.sequence or last_sequence + 1
                 index = len(products)
