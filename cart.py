@@ -206,7 +206,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         return [p[1] for p in products]
 
     @classmethod
-    def domain_append(cls, domain):
+    def append_domain(cls, domain):
         pass
 
     @classmethod
@@ -239,7 +239,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         domain = [('state', 'in', state)]
         if warehouse:
             domain.append(('warehouse', '=', warehouse))
-        cls.domain_append(domain)
+        cls.append_domain(domain)
 
         try:
             # Locks transaction. Nobody can query this table
