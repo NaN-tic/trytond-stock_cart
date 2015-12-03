@@ -71,10 +71,17 @@ copyright notices and license terms. -->
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
-        <record model="ir.model.access" id="access_stock_cart">
+        <record model="ir.model.access" id="access_stock_cart_stock_cart">
             <field name="model" search="[('model', '=', 'stock.cart')]"/>
             <field name="group" ref="group_stock_cart"/>
             <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_stock_cart">
+            <field name="model" search="[('model', '=', 'stock.cart')]"/>
+            <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
@@ -147,7 +154,7 @@ copyright notices and license terms. -->
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
-        <record model="ir.model.access" id="access_sstock_shipment_out_tock_cart">
+        <record model="ir.model.access" id="access_stock_shipment_out_stock_cart">
             <field name="model" search="[('model', '=', 'stock.shipment.out.cart')]"/>
             <field name="group" ref="group_stock_cart"/>
             <field name="perm_read" eval="True"/>
@@ -155,6 +162,12 @@ copyright notices and license terms. -->
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="False"/>
         </record>
-
+        <record model="ir.model.access" id="access_stock_shipment_out_cart">
+            <field name="model" search="[('model', '=', 'stock.shipment.out.cart')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
     </data>
 </tryton>
