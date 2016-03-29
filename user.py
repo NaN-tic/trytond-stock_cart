@@ -5,10 +5,10 @@ from trytond.model import fields
 from trytond.pool import PoolMeta
 
 __all__ = ['User']
-__metaclass__ = PoolMeta
 
 
 class User:
+    __metaclass__ = PoolMeta
     __name__ = "res.user"
     cart = fields.Many2One('stock.cart', 'Cart')
 

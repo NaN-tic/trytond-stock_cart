@@ -3,14 +3,13 @@
 # the full copyright notices and license terms.
 from time import sleep
 from trytond.model import ModelView, ModelSQL, fields, Unique
-from trytond.pool import Pool, PoolMeta
+from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, Equal, Not
 from trytond.rpc import RPC
 import logging
 
 __all__ = ['StockCart', 'StockShipmentOutCart']
-__metaclass__ = PoolMeta
 
 logger = logging.getLogger(__name__)
 
