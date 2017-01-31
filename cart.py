@@ -2,6 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 from time import sleep
+from decimal import Decimal
 from trytond.model import ModelView, ModelSQL, fields, Unique
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
@@ -9,10 +10,13 @@ from trytond.pyson import Eval, Equal, Not
 from trytond.rpc import RPC
 import logging
 
-__all__ = ['StockCart', 'StockShipmentOutCart']
+__all__ = ['StockCart', 'StockShipmentOutCart', 'StockShipmentOutCartLine']
 __metaclass__ = PoolMeta
 
 logger = logging.getLogger(__name__)
+STATES = {
+    'readonly': Not(Equal(Eval('state'), 'draft')),
+}
 
 
 class StockCart(ModelSQL, ModelView):
@@ -47,21 +51,15 @@ class StockCart(ModelSQL, ModelView):
 
 
 class StockShipmentOutCart(ModelSQL, ModelView):
-    ' Stock Shipment Cart'
+    'Stock Shipment Out Cart'
     __name__ = 'stock.shipment.out.cart'
     _rec_name = 'shipment'
     shipment = fields.Many2One('stock.shipment.out', 'Shipment', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
+        states=STATES, depends=['state'], ondelete='CASCADE')
     cart = fields.Many2One('stock.cart', 'Cart', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
+        states=STATES, depends=['state'])
     user = fields.Many2One('res.user', 'User', required=True,
-        states={
-            'readonly': Not(Equal(Eval('state'), 'draft')),
-        }, depends=['state'])
+        states=STATES, depends=['state'])
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done'),
@@ -106,16 +104,58 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def done(cls, carts):
+        CartLine = Pool().get('stock.shipment.out.cart.line')
+
         cls.write(carts, {
             'state': 'done',
             })
 
+        domain = ['OR']
+        for cart in carts:
+            domain.append([
+                ('shipment', '=', cart.shipment.id),
+                ('cart', '=', cart.cart.id),
+                ('user', '=', cart.user.id),
+            ])
+        lines_to_done = CartLine.search(domain)
+        if lines_to_done:
+            CartLine.done(lines_to_done)
+
     @classmethod
     @ModelView.button
     def draft(cls, carts):
+        CartLine = Pool().get('stock.shipment.out.cart.line')
+
         cls.write(carts, {
             'state': 'draft',
             })
+
+        domain = ['OR']
+        for cart in carts:
+            domain.append([
+                ('shipment', '=', cart.shipment.id),
+                ('cart', '=', cart.cart.id),
+                ('user', '=', cart.user.id),
+            ])
+        lines_to_draft = CartLine.search(domain)
+        if lines_to_draft:
+            CartLine.draft(lines_to_draft)
+
+    @classmethod
+    def delete(cls, carts):
+        CartLine = Pool().get('stock.shipment.out.cart.line')
+
+        domain = ['OR']
+        for cart in carts:
+            domain.append([
+                ('shipment', '=', cart.shipment.id),
+                ('cart', '=', cart.cart.id),
+                ('user', '=', cart.user.id),
+            ])
+        lines_to_delete = CartLine.search(domain)
+        if lines_to_delete:
+            CartLine.delete(lines_to_delete)
+        super(StockShipmentOutCart, cls).delete(carts)
 
     @staticmethod
     def product_info(product):
@@ -312,3 +352,147 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     def print_shipments(cls, shipments):
         '''Custome print shipment method'''
         return
+
+
+class StockShipmentOutCartLine(ModelSQL, ModelView):
+    'Stock Shipment Out Cart Line'
+    __name__ = 'stock.shipment.out.cart.line'
+    _rec_name = 'shipment'
+    shipment = fields.Many2One('stock.shipment.out', 'Shipment Out',
+        required=True, states=STATES, depends=['state'], ondelete='CASCADE')
+    cart = fields.Many2One('stock.cart', 'Cart', required=True,
+        states=STATES, depends=['state'])
+    user = fields.Many2One('res.user', 'User', required=True,
+        states=STATES, depends=['state'])
+    product = fields.Many2One('product.product', 'Product',
+        required=True, states=STATES, depends=['state'])
+    product_uom_category = fields.Function(
+        fields.Many2One('product.uom.category', 'Product Uom Category'),
+        'on_change_with_product_uom_category')
+    uom = fields.Many2One("product.uom", "Uom", required=True, states=STATES,
+        domain=[
+            ('category', '=', Eval('product_uom_category')),
+            ],
+        depends=['state', 'product_uom_category'])
+    unit_digits = fields.Function(fields.Integer('Unit Digits'),
+        'on_change_with_unit_digits')
+    quantity = fields.Float("Quantity", required=True,
+        digits=(16, Eval('unit_digits', 2)), states=STATES,
+        depends=['state', 'unit_digits'])
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('done', 'Done'),
+        ], 'State', readonly=True)
+
+    @classmethod
+    def __setup__(cls):
+        super(StockShipmentOutCartLine, cls).__setup__()
+        cls._buttons.update({
+            'done': {
+                'invisible': Eval('state') == 'done',
+                },
+            'draft': {
+                'invisible': Eval('state') == 'draft',
+                },
+            })
+
+    @staticmethod
+    def default_cart():
+        User = Pool().get('res.user')
+        user = User(Transaction().user)
+        return user.cart.id if user.cart else None
+
+    @staticmethod
+    def default_user():
+        return Transaction().user
+
+    @staticmethod
+    def default_state():
+        return 'draft'
+
+    @fields.depends('product')
+    def on_change_with_product_uom_category(self, name=None):
+        if self.product:
+            return self.product.default_uom_category.id
+
+    @fields.depends('uom')
+    def on_change_with_unit_digits(self, name=None):
+        if self.uom:
+            return self.uom.digits
+        return 2
+
+    @fields.depends('product', 'uom',)
+    def on_change_product(self):
+        if self.product:
+            self.uom = self.product.default_uom
+
+    @classmethod
+    @ModelView.button
+    def done(cls, lines):
+        cls.write(lines, {
+            'state': 'done',
+            })
+
+    @classmethod
+    @ModelView.button
+    def draft(cls, lines):
+        cls.write(lines, {
+            'state': 'draft',
+            })
+
+    @classmethod
+    def save_pickings(cls, pickings):
+        'Save pickings lines'
+        # pickings = {shipment: {product: qty}}
+        pool = Pool()
+        User = pool.get('res.user')
+        ShipmentOut = pool.get('stock.shipment.out')
+        Product = pool.get('product.product')
+
+        user = User(Transaction().user)
+        cart = user.cart if user.cart else None
+
+        if not pickings or not cart:
+            return
+
+        domain = ['OR']
+        shipments = []
+        products = []
+        for shipment_code, v in pickings.iteritems():
+            domain.append([
+                ('shipment.code', '=', shipment_code), # TODO 4.0 change code to number
+                ('cart', '=', cart.id),
+                ('user', '=', user.id),
+            ])
+            shipments.append(shipment_code)
+            products.append(int(v['product']))
+
+        shipments = dict((s.code, s) for s in ShipmentOut.search([
+                ('code', 'in', shipments),
+                ]))
+        products = dict((p.id, p) for p in Product.search([
+                ('id', 'in', products),
+                ]))
+
+        picking_lines = []
+        for line in cls.search(domain):
+            # TODO all products has a product code
+            picking_lines.append((line.shipment.code, line.product.id))
+
+        to_create = []
+        for shipment_code, v in pickings.iteritems():
+            product_id = int(v['product'])
+            qty = Decimal(v['qty'])
+
+            if (shipment_code, product_id) in picking_lines:
+                continue
+
+            new_line = cls()
+            new_line.shipment = shipments[shipment_code]
+            new_line.product = products[product_id]
+            new_line.quantity = qty
+            new_line.on_change_product()
+            to_create.append(new_line._save_values)
+
+        if to_create:
+            cls.create(to_create)

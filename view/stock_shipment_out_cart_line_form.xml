@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- This file is part of stock_cart module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<form string="Line">
+    <label name="shipment"/>
+    <field name="shipment"/>
+    <label name="cart"/>
+    <field name="cart"/>
+    <label name="user"/>
+    <field name="user"/>
+    <label name="product"/>
+    <field name="product"/>
+    <label name="uom"/>
+    <field name="uom"/>
+    <label name="quantity"/>
+    <field name="quantity"/>
+    <label name="state"/>
+    <field name="state"/>
+    <group col="4" colspan="3" id="buttons">
+        <button name="done" string="Done" icon="tryton-go-next"/>
+        <button name="draft" string="Draft" icon="tryton-clear"/>
+    </group>
+</form>

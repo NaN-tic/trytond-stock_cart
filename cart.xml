@@ -169,5 +169,70 @@ copyright notices and license terms. -->
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
+
+        <!-- stock.shipment.out.cart.line -->
+        <record model="ir.action.act_window" id="act_stock_shipment_out_cart_line">
+            <field name="name">Lines</field>
+            <field name="res_model">stock.shipment.out.cart.line</field>
+            <field name="domain"></field>
+            <field name="search_value"></field>
+        </record>
+        <record model="ir.ui.view" id="stock_shipment_out_cart_line_tree_view">
+            <field name="model">stock.shipment.out.cart.line</field>
+            <field name="type">tree</field>
+            <field name="priority" eval="30"/>
+            <field name="name">stock_shipment_out_cart_line_tree</field>
+        </record>
+        <record model="ir.ui.view" id="stock_shipment_out_cart_line_form_view">
+            <field name="model">stock.shipment.out.cart.line</field>
+            <field name="type">form</field>
+            <field name="priority" eval="30"/>
+            <field name="name">stock_shipment_out_cart_line_form</field>
+        </record>
+
+        <menuitem
+            id="menu_stock_shipment_out_cart_line"
+            name="Lines"
+            parent="menu_stock_shipment_out_cart"
+            action="act_stock_shipment_out_cart_line"/>
+
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_line_draft">
+            <field name="name">Draft</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain"
+                eval="[('state','=','draft')]"
+                pyson="1"/>
+            <field name="act_window" ref="act_stock_shipment_out_cart_line"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_line_done">
+            <field name="name">Done</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain"
+                eval="[('state','=','done')]"
+                pyson="1"/>
+            <field name="act_window" ref="act_stock_shipment_out_cart_line"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_line_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="999"/>
+            <field name="domain"></field>
+            <field name="act_window" ref="act_stock_shipment_out_cart_line"/>
+        </record>
+
+        <record model="ir.model.access" id="access_stock_shipment_out_stock_cart_line">
+            <field name="model" search="[('model', '=', 'stock.shipment.out.cart.line')]"/>
+            <field name="group" ref="group_stock_cart"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_stock_shipment_out_cart_line">
+            <field name="model" search="[('model', '=', 'stock.shipment.out.cart.line')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
     </data>
 </tryton>

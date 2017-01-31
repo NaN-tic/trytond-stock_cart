@@ -9,5 +9,6 @@ def register():
     Pool.register(
         StockCart,
         StockShipmentOutCart,
+        StockShipmentOutCartLine,
         User,
         module='stock_cart', type_='model')
