@@ -5,6 +5,8 @@ copyright notices and license terms. -->
 <form string="Line">
     <label name="shipment"/>
     <field name="shipment"/>
+    <label name="from_location"/>
+    <field name="from_location"/>
     <label name="cart"/>
     <field name="cart"/>
     <label name="user"/>

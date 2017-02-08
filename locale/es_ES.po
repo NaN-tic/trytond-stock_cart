@@ -94,6 +94,70 @@ msgctxt "field:stock.shipment.out.cart,write_uid:"
 msgid "Write User"
 msgstr "Usuario modificación"
 
+msgctxt "field:stock.shipment.out.cart.line,cart:"
+msgid "Cart"
+msgstr "Carro"
+
+msgctxt "field:stock.shipment.out.cart.line,create_date:"
+msgid "Create Date"
+msgstr "Fecha de creación"
+
+msgctxt "field:stock.shipment.out.cart.line,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:stock.shipment.out.cart.line,from_location:"
+msgid "From Location"
+msgstr "Desde ubicación"
+
+msgctxt "field:stock.shipment.out.cart.line,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:stock.shipment.out.cart.line,product:"
+msgid "Product"
+msgstr "Producto"
+
+msgctxt "field:stock.shipment.out.cart.line,product_uom_category:"
+msgid "Product Uom Category"
+msgstr "Categoría UdM del producto"
+
+msgctxt "field:stock.shipment.out.cart.line,quantity:"
+msgid "Quantity"
+msgstr "Cantidad"
+
+msgctxt "field:stock.shipment.out.cart.line,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:stock.shipment.out.cart.line,shipment:"
+msgid "Shipment Out"
+msgstr "Albarán cliente"
+
+msgctxt "field:stock.shipment.out.cart.line,state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "field:stock.shipment.out.cart.line,unit_digits:"
+msgid "Unit Digits"
+msgstr "Decimales de la unidad"
+
+msgctxt "field:stock.shipment.out.cart.line,uom:"
+msgid "Uom"
+msgstr "UdM"
+
+msgctxt "field:stock.shipment.out.cart.line,user:"
+msgid "User"
+msgstr "Usuario"
+
+msgctxt "field:stock.shipment.out.cart.line,write_date:"
+msgid "Write Date"
+msgstr "Fecha de modificación"
+
+msgctxt "field:stock.shipment.out.cart.line,write_uid:"
+msgid "Write User"
+msgstr "Usuario de modificación"
+
 msgctxt "help:stock.cart,columns:"
 msgid "Number of columns are available in this cart"
 msgstr "Número de columnas disponibles en esta cesta"
@@ -114,6 +178,10 @@ msgctxt "model:ir.action,name:act_stock_shipment_out_cart"
 msgid "Carts"
 msgstr "Carros"
 
+msgctxt "model:ir.action,name:act_stock_shipment_out_cart_line"
+msgid "Lines"
+msgstr "Líneas"
+
 msgctxt ""
 "model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_all"
 msgid "All"
@@ -129,6 +197,21 @@ msgctxt ""
 msgid "Draft"
 msgstr "Borrador"
 
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_line_all"
+msgid "All"
+msgstr "Todos"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_line_done"
+msgid "Done"
+msgstr "Realizar"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_stock_cart_shipment_out_domain_cart_line_draft"
+msgid "Draft"
+msgstr "Borrador"
+
 msgctxt "model:ir.ui.menu,name:menu_stock_cart"
 msgid "Carts"
 msgstr "Carros"
@@ -140,6 +223,10 @@ msgstr "Carros"
 msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart"
 msgid "Customer Shipments"
 msgstr "Albaranes cliente"
+
+msgctxt "model:ir.ui.menu,name:menu_stock_shipment_out_cart_line"
+msgid "Lines"
+msgstr "Líneas"
 
 msgctxt "model:res.group,name:group_stock_cart"
 msgid "Stock Cart"
@@ -154,14 +241,26 @@ msgid "Stock Cart"
 msgstr "Cestas Almacén"
 
 msgctxt "model:stock.shipment.out.cart,name:"
-msgid "Stock Shipment Cart"
+msgid "Stock Shipment Out Cart"
 msgstr "Cestas albarán salida"
+
+msgctxt "model:stock.shipment.out.cart.line,name:"
+msgid "Stock Shipment Out Cart Line"
+msgstr "Líneas cestas albarán salida"
 
 msgctxt "selection:stock.shipment.out.cart,state:"
 msgid "Done"
 msgstr "Realizado"
 
 msgctxt "selection:stock.shipment.out.cart,state:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "selection:stock.shipment.out.cart.line,state:"
+msgid "Done"
+msgstr "Realizar"
+
+msgctxt "selection:stock.shipment.out.cart.line,state:"
 msgid "Draft"
 msgstr "Borrador"
 
@@ -172,6 +271,18 @@ msgstr "Carro"
 msgctxt "view:stock.cart:"
 msgid "Carts"
 msgstr "Carros"
+
+msgctxt "view:stock.shipment.out.cart.line:"
+msgid "Done"
+msgstr "Realizar"
+
+msgctxt "view:stock.shipment.out.cart.line:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "view:stock.shipment.out.cart.line:"
+msgid "Line"
+msgstr "Línea"
 
 msgctxt "view:stock.shipment.out.cart:"
 msgid "Cart"

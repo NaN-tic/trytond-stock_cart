@@ -208,7 +208,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                         and move.product.id not in products[jindex - 1][1]):
                     jindex -= 1
 
-                location = move.from_location.rec_name
+                # location name will be used later to find the location ID
+                location = move.from_location.name
+
                 if jindex <= 0:
                     # Append this product to the list
                     product = cls.product_info(move.product)
@@ -360,6 +362,11 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
     _rec_name = 'shipment'
     shipment = fields.Many2One('stock.shipment.out', 'Shipment Out',
         required=True, states=STATES, depends=['state'], ondelete='CASCADE')
+    from_location = fields.Many2One('stock.location', 'From Location',
+        domain=[
+            ('type', 'not in', ['warehouse', 'view']),
+            ],
+        required=True, states=STATES, depends=['state'])
     cart = fields.Many2One('stock.cart', 'Cart', required=True,
         states=STATES, depends=['state'])
     user = fields.Many2One('res.user', 'User', required=True,
@@ -448,6 +455,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         User = pool.get('res.user')
         ShipmentOut = pool.get('stock.shipment.out')
         Product = pool.get('product.product')
+        Location = pool.get('stock.location')
 
         user = User(Transaction().user)
         cart = user.cart if user.cart else None
@@ -458,6 +466,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         domain = ['OR']
         shipments = []
         products = []
+        locations = []
         for shipment_code, v in pickings.iteritems():
             domain.append([
                 ('shipment.code', '=', shipment_code), # TODO 4.0 change code to number
@@ -466,12 +475,16 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
             ])
             shipments.append(shipment_code)
             products.append(int(v['product']))
+            locations.append(v['location'])
 
         shipments = dict((s.code, s) for s in ShipmentOut.search([
                 ('code', 'in', shipments),
                 ]))
         products = dict((p.id, p) for p in Product.search([
                 ('id', 'in', products),
+                ]))
+        locations = dict((s.name, s) for s in Location.search([
+                ('name', 'in', locations),
                 ]))
 
         picking_lines = []
@@ -489,6 +502,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
             new_line = cls()
             new_line.shipment = shipments[shipment_code]
+            new_line.from_location = locations[v['location']]
             new_line.product = products[product_id]
             new_line.quantity = qty
             new_line.on_change_product()

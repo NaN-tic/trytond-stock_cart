@@ -194,7 +194,8 @@ copyright notices and license terms. -->
             id="menu_stock_shipment_out_cart_line"
             name="Lines"
             parent="menu_stock_shipment_out_cart"
-            action="act_stock_shipment_out_cart_line"/>
+            action="act_stock_shipment_out_cart_line"
+            icon="tryton-list"/>
 
         <record model="ir.action.act_window.domain" id="act_stock_cart_shipment_out_domain_cart_line_draft">
             <field name="name">Draft</field>
