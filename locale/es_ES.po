@@ -24,7 +24,7 @@ msgstr "Fecha creación"
 
 msgctxt "field:stock.cart,create_uid:"
 msgid "Create User"
-msgstr "Usuario creación"
+msgstr "Usuario de creación"
 
 msgctxt "field:stock.cart,id:"
 msgid "ID"
@@ -52,7 +52,11 @@ msgstr "Fecha modificación"
 
 msgctxt "field:stock.cart,write_uid:"
 msgid "Write User"
-msgstr "Usuario modificación"
+msgstr "Usuario de modificación"
+
+msgctxt "field:stock.inventory.line,picking_quantity:"
+msgid "Picking Quantity"
+msgstr "Cantidad picking"
 
 msgctxt "field:stock.shipment.out.cart,cart:"
 msgid "Cart"
@@ -64,7 +68,7 @@ msgstr "Fecha creación"
 
 msgctxt "field:stock.shipment.out.cart,create_uid:"
 msgid "Create User"
-msgstr "Usuario creación"
+msgstr "Usuario de creación"
 
 msgctxt "field:stock.shipment.out.cart,id:"
 msgid "ID"
@@ -92,7 +96,7 @@ msgstr "Fecha modificación"
 
 msgctxt "field:stock.shipment.out.cart,write_uid:"
 msgid "Write User"
-msgstr "Usuario modificación"
+msgstr "Usuario de modificación"
 
 msgctxt "field:stock.shipment.out.cart.line,cart:"
 msgid "Cart"
