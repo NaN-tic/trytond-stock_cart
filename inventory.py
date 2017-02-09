@@ -14,6 +14,13 @@ class Inventory:
     __name__ = 'stock.inventory'
 
     @classmethod
+    def confirm(cls, inventories):
+        # Confirm an inventory do a write and write call again complete_lines
+        # We add confirm in the context to not skip to calculate get_picking_quantity
+        with Transaction().set_context(confirm_inventory=True):
+            super(Inventory, cls).confirm(inventories)
+
+    @classmethod
     def complete_lines(cls, inventories, fill=True):
         # can't call Line.create_values4complete() because we don't have the product.
         # At the moment, to add new values is call complete_lines (yes, other write)
@@ -21,7 +28,7 @@ class Inventory:
 
         super(Inventory, cls).complete_lines(inventories, fill)
 
-        if Transaction().context.get('confirm', False):
+        if Transaction().context.get('confirm_inventory', False):
             return
 
         to_write = []
