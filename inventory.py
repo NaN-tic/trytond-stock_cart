@@ -4,6 +4,7 @@
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Eval
+from trytond.transaction import Transaction
 
 __all__ = ['Inventory', 'InventoryLine']
 
@@ -19,6 +20,9 @@ class Inventory:
         InventoryLine = Pool().get('stock.inventory.line')
 
         super(Inventory, cls).complete_lines(inventories, fill)
+
+        if Transaction().context.get('confirm', False):
+            return
 
         to_write = []
         for inventory in inventories:
