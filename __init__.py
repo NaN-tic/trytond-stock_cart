@@ -12,6 +12,7 @@ def register():
         cart.StockCart,
         cart.StockShipmentOutCart,
         cart.StockShipmentOutCartLine,
+        inventory.Inventory,
         inventory.InventoryLine,
         user.User,
         module='stock_cart', type_='model')

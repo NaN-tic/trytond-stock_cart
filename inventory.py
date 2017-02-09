@@ -5,7 +5,38 @@ from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Eval
 
-__all__ = ['InventoryLine']
+__all__ = ['Inventory', 'InventoryLine']
+
+
+class Inventory:
+    __metaclass__ = PoolMeta
+    __name__ = 'stock.inventory'
+
+    @classmethod
+    def complete_lines(cls, inventories, fill=True):
+        # can't call Line.create_values4complete() because we don't have the product.
+        # At the moment, to add new values is call complete_lines (yes, other write)
+        InventoryLine = Pool().get('stock.inventory.line')
+
+        super(Inventory, cls).complete_lines(inventories, fill)
+
+        to_write = []
+        for inventory in inventories:
+            products = set()
+            for line in inventory.lines:
+                products.add(line.product)
+
+            vals = InventoryLine.get_picking_quantity(
+                inventory.location, list(products))
+
+            for line in inventory.lines:
+                # TODO two or more lines with same product or with lots
+                picking_qty = vals.get(line.product.id)
+                if picking_qty:
+                    to_write.extend(([line], {'picking_quantity': picking_qty}))
+
+        if to_write:
+            InventoryLine.write(*to_write)
 
 
 class InventoryLine:
@@ -18,18 +49,30 @@ class InventoryLine:
     def default_picking_quantity():
         return 0
 
-    @fields.depends('product', 'inventory')
-    def on_change_product(self):
+    @classmethod
+    def get_picking_quantity(cls, location, products):
+        """"
+        Return a dict with product ID and picking quantity
+        """
         CartLine = Pool().get('stock.shipment.out.cart.line')
 
+        vals = {}
+        for line in CartLine.search([
+                ('product', 'in', products),
+                ('from_location', '=', location),
+                ('shipment.state', '=', 'assigned')
+                ]):
+            product_id = line.product.id
+            if product_id in vals:
+                vals[product_id] += line.quantity
+            else:
+                vals[product_id] = line.quantity
+        return vals
+
+    @fields.depends('product', 'inventory')
+    def on_change_product(self):
         super(InventoryLine, self).on_change_product()
 
         if self.product:
-            picking_quantity = 0
-            for line in CartLine.search([
-                    ('product', '=', self.product),
-                    ('from_location', '=', self.inventory.location),
-                    ('shipment.state', '=', 'assigned')
-                    ]):
-                picking_quantity += line.quantity
-            self.picking_quantity = picking_quantity
+            vals = self.get_picking_quantity(self.inventory.location, [self.product])
+            self.picking_quantity = vals.get(self.product.id, 0)
