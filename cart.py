@@ -187,17 +187,41 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             ]
         Where products are sorted by location path
         '''
+        pool = Pool()
         Location = Pool().get('stock.location')
-        location, = Location.search([], limit=1, order=[('sequence', 'DESC')])
-        last_sequence = location.sequence or 0
+        User = pool.get('res.user')
+
+        user = User(Transaction().user)
+
+        if user.stock_locations:
+            locations = list(user.stock_locations)
+        elif user.stock_warehouse:
+            locations = [user.stock_warehouse.storage_location]
+        else:
+            locations = []
+            for warehouse in Location.search([
+                    ('type', '=', 'warehouse'),
+                    ]):
+                locations.append(warehouse.storage_location)
+
+        locs = Location.search([
+                ('parent', 'child_of', [l.id for l in locations]),
+                ])
+        if locs:
+            locations += locs
+        location_ids = [l.id for l in locations]
+
         products = []
         for cart in carts:
             shipment = cart.shipment
             for move in shipment.inventory_moves:
                 if move.state != 'assigned':
                     continue
+                if move.from_location.id not in location_ids:
+                    continue
+
                 # If location has not sequence, put it in the end
-                sequence = move.from_location.sequence or last_sequence + 1
+                sequence = move.from_location.sequence or 1
                 index = len(products)
                 while index > 0 and products[index - 1][0] > sequence:
                     index -= 1
@@ -252,6 +276,39 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         pass
 
     @classmethod
+    def filter_domain_by_locations(cls, domain):
+        pool = Pool()
+        User = pool.get('res.user')
+        Location = pool.get('stock.location')
+        Move = pool.get('stock.move')
+
+        user = User(Transaction().user)
+        locations = user.stock_locations
+        if locations:
+            # search shipments are in user locations but not shipments
+            # have other moves in others locations when user not have access
+            # in locations preference
+            locs = Location.search([
+                    ('parent', 'child_of', [l.id for l in locations]),
+                    ])
+            locs_notin = Location.search([
+                    ('id', 'not in', [l.id for l in locs]),
+                    ])
+            moves_in = Move.search([
+                    ('state', '=', 'assigned'),
+                    ('from_location', 'in', [l.id for l in locs]),
+                    ('shipment', 'like', 'stock.shipment.out,%'),
+                    ])
+            moves_notin = Move.search([
+                    ('state', '=', 'assigned'),
+                    ('from_location', 'in', [l.id for l in locs_notin]),
+                    ('shipment', 'like', 'stock.shipment.out,%'),
+                    ])
+            shipments_exclude = [m.shipment for m in moves_notin]
+            moves = [m for m in moves_in if m.shipment not in shipments_exclude]
+            domain.append(('moves', 'in', [m.id for m in moves]))
+
+    @classmethod
     def filter_shipments(cls, shipments):
         return shipments
 
@@ -281,6 +338,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         domain = [('state', 'in', state)]
         if warehouse:
             domain.append(('warehouse', '=', warehouse))
+        cls.filter_domain_by_locations(domain)
         cls.append_domain(domain)
 
         try:
@@ -310,7 +368,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
 
             # Assign new shipments
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
-                if s.carrier else 999} for s in shipments]
+                if hasattr(s, 'carrier') and s.carrier else 999} for s in shipments]
             shipments = [s['id'] for s in sorted(pickings, key=lambda k: k['sequence'])]
 
             carts_assigned = [c.shipment.id for c in Carts.search([
