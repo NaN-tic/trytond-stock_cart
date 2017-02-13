@@ -4,14 +4,14 @@
 from time import sleep
 from decimal import Decimal
 from trytond.model import ModelView, ModelSQL, fields, Unique
-from trytond.pool import Pool, PoolMeta
+from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, Equal, Not
 from trytond.rpc import RPC
 import logging
 
 __all__ = ['StockCart', 'StockShipmentOutCart', 'StockShipmentOutCartLine']
-__metaclass__ = PoolMeta
+
 
 logger = logging.getLogger(__name__)
 STATES = {
@@ -240,7 +240,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     product = cls.product_info(move.product)
                     product['shipments'] = [{
                             'id': shipment.id,
-                            'code': shipment.code,
+                            'code': shipment.number,
                             'quantity': move.quantity,
                             'location': location,
                             }]
@@ -258,7 +258,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     product = products[index - 1][1][move.product.id]
                     product['shipments'].append({
                                 'id': shipment.id,
-                                'code': shipment.code,
+                                'code': shipment.number,
                                 'quantity': move.quantity,
                                 'location': location,
                                 })
@@ -340,10 +340,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             domain.append(('warehouse', '=', warehouse))
         cls.filter_domain_by_locations(domain)
         cls.append_domain(domain)
-
         try:
             # Locks transaction. Nobody can query this table
-            transaction.cursor.lock(Carts._table)
+            transaction.database.lock(Transaction().connection, Carts._table)
         except:
             # Table is locked. Captures operational error and returns void list
             if attempts < total_attempts:
@@ -525,18 +524,18 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         shipments = []
         products = []
         locations = []
-        for shipment_code, v in pickings.iteritems():
+        for shipment_number, v in pickings.iteritems():
             domain.append([
-                ('shipment.code', '=', shipment_code), # TODO 4.0 change code to number
+                ('shipment.number', '=', shipment_number),
                 ('cart', '=', cart.id),
                 ('user', '=', user.id),
             ])
-            shipments.append(shipment_code)
+            shipments.append(shipment_number)
             products.append(int(v['product']))
             locations.append(v['location'])
 
-        shipments = dict((s.code, s) for s in ShipmentOut.search([
-                ('code', 'in', shipments),
+        shipments = dict((s.number, s) for s in ShipmentOut.search([
+                ('number', 'in', shipments),
                 ]))
         products = dict((p.id, p) for p in Product.search([
                 ('id', 'in', products),
@@ -547,19 +546,19 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
         picking_lines = []
         for line in cls.search(domain):
-            # TODO all products has a product code
-            picking_lines.append((line.shipment.code, line.product.id))
+            # TODO all products has a product number
+            picking_lines.append((line.shipment.number, line.product.id))
 
         to_create = []
-        for shipment_code, v in pickings.iteritems():
+        for shipment_number, v in pickings.iteritems():
             product_id = int(v['product'])
             qty = Decimal(v['qty'])
 
-            if (shipment_code, product_id) in picking_lines:
+            if (shipment_number, product_id) in picking_lines:
                 continue
 
             new_line = cls()
-            new_line.shipment = shipments[shipment_code]
+            new_line.shipment = shipments[shipment_number]
             new_line.from_location = locations[v['location']]
             new_line.product = products[product_id]
             new_line.quantity = qty

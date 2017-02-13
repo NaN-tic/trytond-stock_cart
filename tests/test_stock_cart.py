@@ -5,110 +5,106 @@ import unittest
 import doctest
 import datetime
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
+from functools import partial
+from collections import defaultdict
+
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import ModuleTestCase
-from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
+from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.tests.test_tryton import doctest_setup, doctest_teardown
+from trytond.tests.test_tryton import doctest_checker
 from trytond.transaction import Transaction
+from trytond.exceptions import UserWarning
+from trytond.pool import Pool
+
+from trytond.modules.company.tests import create_company, set_company
 
 
 class StockCartTestCase(ModuleTestCase):
     'Test Stock Cart module'
     module = 'stock_cart'
 
-    def setUp(self):
-        super(StockCartTestCase, self).setUp()
-        self.company = POOL.get('company.company')
-        self.user = POOL.get('res.user')
-        self.party = POOL.get('party.party')
-        self.location = POOL.get('stock.location')
-        self.move = POOL.get('stock.move')
-        self.category = POOL.get('product.category')
-        self.template = POOL.get('product.template')
-        self.product = POOL.get('product.product')
-        self.uom = POOL.get('product.uom')
-        self.cart = POOL.get('stock.cart')
-        self.sout_cart = POOL.get('stock.shipment.out.cart')
-        self.sout_cart_line = POOL.get('stock.shipment.out.cart.line')
-        self.shipment_out = POOL.get('stock.shipment.out')
-
+    @with_transaction()
     def test0010picking(self):
         'Test Picking'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            today = datetime.date.today()
-            unit, = self.uom.search([('name', '=', 'Unit')])
-            supplier_loc, = self.location.search([('code', '=', 'SUP')])
-            customer_loc, = self.location.search([('code', '=', 'CUS')])
-            storage_loc, = self.location.search([('code', '=', 'STO')])
-            output_loc, = self.location.search([('code', '=', 'OUT')])
-            warehouse_loc, = self.location.search([('code', '=', 'WH')])
 
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin'),
-                    ])
-            currency = company.currency
+        pool = Pool()
+        Company = pool.get('company.company')
+        User = pool.get('res.user')
+        Party = pool.get('party.party')
+        Location = pool.get('stock.location')
+        Move = pool.get('stock.move')
+        Category = pool.get('product.category')
+        Template = pool.get('product.template')
+        Product = pool.get('product.product')
+        Uom = pool.get('product.uom')
+        Cart = pool.get('stock.cart')
+        Sout_cart = pool.get('stock.shipment.out.cart')
+        Sout_cart_line = pool.get('stock.shipment.out.cart.line')
+        ShipmentOut = pool.get('stock.shipment.out')
 
-            self.user.write([self.user(USER)], {
-                'main_company': company.id,
-                'company': company.id,
-                })
+        today = datetime.date.today()
+        unit, = Uom.search([('name', '=', 'Unit')])
+        supplier_loc, = Location.search([('code', '=', 'SUP')])
+        customer_loc, = Location.search([('code', '=', 'CUS')])
+        storage_loc, = Location.search([('code', '=', 'STO')])
+        output_loc, = Location.search([('code', '=', 'OUT')])
+        warehouse_loc, = Location.search([('code', '=', 'WH')])
 
-            # create customer
-            customer, = self.party.create([{
-                        'name': 'Customer',
-                        'addresses': [
-                            ('create', [{
-                                'street': 'St sample, 15',
-                                }]),
-                            ],
-                        }])
+        company = create_company()
+        currency = company.currency
 
-            # create products
-            category, = self.category.create([{
-                        'name': 'Test Picking',
-                        }])
-            template, = self.template.create([{
-                        'name': 'Product 1',
-                        'type': 'goods',
-                        'list_price': Decimal(1),
-                        'cost_price': Decimal(0),
-                        'category': category.id,
-                        'cost_price_method': 'fixed',
-                        'default_uom': unit.id,
-                        }])
-            product1, = self.product.create([{
-                        'template': template.id,
-                        'code': 'PROD1',
-                        }])
-            template, = self.template.create([{
-                        'name': 'Product 2',
-                        'type': 'goods',
-                        'list_price': Decimal(1),
-                        'cost_price': Decimal(0),
-                        'category': category.id,
-                        'cost_price_method': 'fixed',
-                        'default_uom': unit.id,
-                        }])
-            product2, = self.product.create([{
-                        'template': template.id,
-                        'code': 'PROD2',
-                        }])
-            template, = self.template.create([{
-                        'name': 'Product 3',
-                        'type': 'goods',
-                        'list_price': Decimal(1),
-                        'cost_price': Decimal(0),
-                        'category': category.id,
-                        'cost_price_method': 'fixed',
-                        'default_uom': unit.id,
-                        }])
-            product3, = self.product.create([{
-                        'template': template.id,
-                        'code': 'PROD3',
-                        }])
+        # create customer
+        customer, = Party.create([{
+                    'name': 'Customer',
+                    'addresses': [
+                        ('create', [{
+                            'street': 'St sample, 15',
+                            }]),
+                        ],
+                    }])
 
+        # create products
+        template, = Template.create([{
+                    'name': 'Product 1',
+                    'type': 'goods',
+                    'list_price': Decimal(1),
+                    'cost_price': Decimal(0),
+                    'cost_price_method': 'fixed',
+                    'default_uom': unit.id,
+                    }])
+        product1, = Product.create([{
+                    'template': template.id,
+                    'code': 'PROD1',
+                    }])
+        template, = Template.create([{
+                    'name': 'Product 2',
+                    'type': 'goods',
+                    'list_price': Decimal(1),
+                    'cost_price': Decimal(0),
+                    'cost_price_method': 'fixed',
+                    'default_uom': unit.id,
+                    }])
+        product2, = Product.create([{
+                    'template': template.id,
+                    'code': 'PROD2',
+                    }])
+        template, = Template.create([{
+                    'name': 'Product 3',
+                    'type': 'goods',
+                    'list_price': Decimal(1),
+                    'cost_price': Decimal(0),
+                    'cost_price_method': 'fixed',
+                    'default_uom': unit.id,
+                    }])
+        product3, = Product.create([{
+                    'template': template.id,
+                    'code': 'PROD3',
+                    }])
+
+        with set_company(company):
             # create new locations
-            loc1, loc2 = self.location.create([{
+            loc1, loc2 = Location.create([{
                         'name': 'LOC1',
                         'type': 'storage',
                         'parent': storage_loc,
@@ -117,7 +113,7 @@ class StockCartTestCase(ModuleTestCase):
                         'type': 'storage',
                         'parent': storage_loc,
                         }])
-            loc1a, loc1b = self.location.create([{
+            loc1a, loc1b = Location.create([{
                         'name': 'LOC1A',
                         'type': 'storage',
                         'parent': loc1,
@@ -128,14 +124,14 @@ class StockCartTestCase(ModuleTestCase):
                         }])
 
             # create new cart
-            cart, = self.cart.create([{
+            cart, = Cart.create([{
                     'name': 'Cart1',
                     'rows': 2,
                     'columns': 2,
                     }])
 
             # upload user preferences
-            self.user.write([self.user(USER)], {
+            User.write([User(Transaction().user)], {
                     'cart': cart.id,
                     'stock_warehouses': [
                         ('add', [warehouse_loc.id]),
@@ -147,7 +143,7 @@ class StockCartTestCase(ModuleTestCase):
                     })
 
             # create new inventory
-            moves = self.move.create([{
+            moves = Move.create([{
                         'product': product1,
                         'uom': unit.id,
                         'quantity': 10,
@@ -181,10 +177,10 @@ class StockCartTestCase(ModuleTestCase):
                         'unit_price': Decimal('1'),
                         'currency': currency.id,
                         }])
-            self.move.do([moves[0], moves[1], moves[2]])
+            Move.do([moves[0], moves[1], moves[2]])
 
             # create a shipment and moves with storage in loc1 locations
-            shipment1, = self.shipment_out.create([{
+            shipment1, = ShipmentOut.create([{
                     'planned_date': today,
                     'customer': customer.id,
                     'delivery_address': customer.addresses[0].id,
@@ -214,7 +210,7 @@ class StockCartTestCase(ModuleTestCase):
                     }])
 
             # create a shipment and moves with storage in loc1 and loc2 locations
-            shipment2, = self.shipment_out.create([{
+            shipment2, = ShipmentOut.create([{
                     'planned_date': today,
                     'customer': customer.id,
                     'delivery_address': customer.addresses[0].id,
@@ -253,11 +249,11 @@ class StockCartTestCase(ModuleTestCase):
                     }])
 
             # wait and assign try shipments
-            self.shipment_out.wait([shipment1, shipment2])
-            self.shipment_out.assign_try([shipment1, shipment2])
+            ShipmentOut.wait([shipment1, shipment2])
+            ShipmentOut.assign_try([shipment1, shipment2])
 
             # 1. Get products group by shipments
-            products = self.sout_cart.get_products()
+            products = Sout_cart.get_products()
             plocs = []
             for p in products:
                 for k, v in p.iteritems():
@@ -268,36 +264,32 @@ class StockCartTestCase(ModuleTestCase):
             self.assertEqual(len(plocs), 2)
 
             # 2. Get products by cart
-            sout_cart, = self.sout_cart.create([{
+            sout_cart, = Sout_cart.create([{
                     'shipment': shipment2.id,
                     }])
 
-            sout_carts = self.sout_cart.search([])
+            sout_carts = Sout_cart.search([])
             self.assertEqual(len(sout_carts), 2)
-            products = self.sout_cart.get_products_by_carts(sout_carts)
+            products = Sout_cart.get_products_by_carts(sout_carts)
             self.assertEqual(len(products), 2)
             self.assertEqual(products[0][1]['quantity'], 4.0)
 
             # Picking lines
             pickings = {
-                shipment1.code: {
+                shipment1.number: {
                     'product': '1',
                     'qty': '2',
                     'location': 'LOC1',
                     },
                 }
-            self.sout_cart_line.save_pickings(pickings)
+            Sout_cart_line.save_pickings(pickings)
 
             # Done carts
-            self.sout_cart.done(sout_carts)
+            Sout_cart.done(sout_carts)
             self.assertEqual(sout_cart.state, 'done')
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
-    from trytond.modules.company.tests import test_company
-    for test in test_company.suite():
-        if test not in suite and not isinstance(test, doctest.DocTestCase):
-            suite.addTest(test)
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
         StockCartTestCase))
     suite.addTests(doctest.DocFileSuite('scenario_stock_cart.rst',
