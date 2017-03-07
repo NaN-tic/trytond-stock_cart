@@ -557,6 +557,8 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
             if (shipment_code, product_id) in picking_lines:
                 continue
+            if not locations.get(v['location']):
+                continue
 
             new_line = cls()
             new_line.shipment = shipments[shipment_code]
