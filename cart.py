@@ -304,8 +304,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     ('from_location', 'in', [l.id for l in locs_notin]),
                     ('shipment', 'like', 'stock.shipment.out,%'),
                     ])
-            shipments_exclude = [m.shipment for m in moves_notin]
-            moves = [m for m in moves_in if m.shipment not in shipments_exclude]
+            shipments_exclude = [m.shipment.id for m in moves_notin]
+            moves = [m for m in moves_in if m.shipment.id not in shipments_exclude]
             domain.append(('moves', 'in', [m.id for m in moves]))
 
     @classmethod
