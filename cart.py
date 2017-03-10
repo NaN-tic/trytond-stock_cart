@@ -104,22 +104,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def done(cls, carts):
-        CartLine = Pool().get('stock.shipment.out.cart.line')
-
         cls.write(carts, {
             'state': 'done',
             })
-
-        domain = ['OR']
-        for cart in carts:
-            domain.append([
-                ('shipment', '=', cart.shipment.id),
-                ('cart', '=', cart.cart.id),
-                ('user', '=', cart.user.id),
-            ])
-        lines_to_done = CartLine.search(domain)
-        if lines_to_done:
-            CartLine.done(lines_to_done)
 
     @classmethod
     @ModelView.button
@@ -472,7 +459,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
     @staticmethod
     def default_state():
-        return 'draft'
+        return 'done'
 
     @fields.depends('product')
     def on_change_with_product_uom_category(self, name=None):
