@@ -42,9 +42,17 @@ class Inventory:
 
             for line in inventory.lines:
                 # TODO two or more lines with same product or with lots
-                picking_qty = vals.get(line.product.id)
+                picking_qty = vals.get(line.product.id, 0)
+
+                qty = line.quantity - picking_qty
+                if not qty >= 0:
+                    qty = 0
+
                 if picking_qty:
-                    to_write.extend(([line], {'picking_quantity': picking_qty}))
+                    to_write.extend(([line], {
+                            'quantity': qty,
+                            'picking_quantity': picking_qty,
+                            }))
 
         if to_write:
             InventoryLine.write(*to_write)
@@ -87,3 +95,8 @@ class InventoryLine:
         if self.product:
             vals = self.get_picking_quantity(self.inventory.location, [self.product])
             self.picking_quantity = vals.get(self.product.id, 0)
+
+    def get_move(self):
+        self.quantity += self.picking_quantity
+        move = super(InventoryLine, self).get_move()
+        return move
