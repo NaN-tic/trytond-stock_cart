@@ -24,38 +24,13 @@ class Inventory:
     def complete_lines(cls, inventories, fill=True):
         # can't call Line.create_values4complete() because we don't have the product.
         # At the moment, to add new values is call complete_lines (yes, other write)
-        InventoryLine = Pool().get('stock.inventory.line')
-
         super(Inventory, cls).complete_lines(inventories, fill)
 
         if Transaction().context.get('confirm_inventory', False):
             return
 
-        to_write = []
-        for inventory in inventories:
-            products = set()
-            for line in inventory.lines:
-                products.add(line.product)
-
-            vals = InventoryLine.get_picking_quantity(
-                inventory.location, list(products))
-
-            for line in inventory.lines:
-                # TODO two or more lines with same product or with lots
-                picking_qty = vals.get(line.product.id, 0)
-
-                qty = line.quantity - picking_qty
-                if not qty >= 0:
-                    qty = 0
-
-                if picking_qty:
-                    to_write.extend(([line], {
-                            'quantity': qty,
-                            'picking_quantity': picking_qty,
-                            }))
-
-        if to_write:
-            InventoryLine.write(*to_write)
+        if fill:
+            cls.complete_lines(inventories, fill=False)
 
 
 class InventoryLine:
@@ -100,3 +75,13 @@ class InventoryLine:
         self.quantity += self.picking_quantity
         move = super(InventoryLine, self).get_move()
         return move
+
+    def update_values4complete(self, quantity):
+        '''
+        Return update values to complete inventory
+        '''
+        values = super(InventoryLine, self).update_values4complete(quantity)
+        values['picking_quantity'] = self.get_picking_quantity(
+            self.inventory.location, [self.product]).get(self.product.id, 0)
+        values['quantity'] = max(quantity - values['picking_quantity'], 0.0)
+        return values
