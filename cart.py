@@ -300,7 +300,8 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         return shipments
 
     @classmethod
-    def get_products(cls, warehouse=None, state=['assigned'], attempts=0, total_attempts=5):
+    def get_products(cls, warehouse=None, state=['assigned'], attempts=0,
+            total_attempts=5, domain=None):
         '''
         Return a list shipments - RPC
         @param warehouse: ID warehouse domain to search shipments
@@ -322,7 +323,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             return []
         baskets = user.cart.rows * user.cart.columns
 
-        domain = [('state', 'in', state)]
+        if not domain:
+            domain = []
+        domain.append(('state', 'in', state))
         if warehouse:
             domain.append(('warehouse', '=', warehouse))
         cls.filter_domain_by_locations(domain)
@@ -343,15 +346,16 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 return []
         else:
             # if there are carts state draft, return first this carts
+            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
+            shipments = cls.filter_shipments(shipments)
+
             carts = Carts.search([
                 ('state', '=', 'draft'),
                 ('user', '=', user),
+                ('shipment', 'in', shipments),
                 ], limit=baskets)
             if carts:
                 return cls.get_products_by_carts(carts)
-
-            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
-            shipments = cls.filter_shipments(shipments)
 
             # Assign new shipments
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
