@@ -81,7 +81,10 @@ class InventoryLine:
         Return update values to complete inventory
         '''
         values = super(InventoryLine, self).update_values4complete(quantity)
-        values['picking_quantity'] = self.get_picking_quantity(
-            self.inventory.location, [self.product]).get(self.product.id, 0)
-        values['quantity'] = max(quantity - values['picking_quantity'], 0.0)
+        picking_quantity = self.get_picking_quantity(self.inventory.location,
+            [self.product]).get(self.product.id, 0)
+        if (self.expected_quantity == self.quantity == quantity and
+                self.picking_quantity != picking_quantity):
+            values['picking_quantity'] = picking_quantity
+            values['quantity'] = max(quantity - picking_quantity, 0.0)
         return values
