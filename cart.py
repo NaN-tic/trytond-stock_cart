@@ -346,18 +346,17 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 return []
         else:
             # if there are carts state draft, return first this carts
-            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
-            shipments = cls.filter_shipments(shipments)
-
             carts = Carts.search([
                 ('state', '=', 'draft'),
                 ('user', '=', user),
-                ('shipment', 'in', shipments),
                 ], limit=baskets)
             if carts:
                 return cls.get_products_by_carts(carts)
 
             # Assign new shipments
+            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
+            shipments = cls.filter_shipments(shipments)
+
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
                 if hasattr(s, 'carrier') and s.carrier else 999} for s in shipments]
             shipments = [s['id'] for s in sorted(pickings, key=lambda k: k['sequence'])]
