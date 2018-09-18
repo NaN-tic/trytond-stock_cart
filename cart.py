@@ -516,14 +516,21 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         products = []
         locations = []
         for shipment_code, v in pickings.iteritems():
-            domain.append([
-                ('shipment.code', '=', shipment_code), # TODO 4.0 change code to number
-                ('cart', '=', cart.id),
-                ('user', '=', user.id),
-            ])
-            shipments.append(shipment_code)
-            products.append(int(v['product']))
-            locations.append(v['location'])
+            if v['status'] == 'done':
+                domain.append([
+                    ('shipment.code', '=', shipment_code), # TODO 4.0 change code to number
+                    ('cart', '=', cart.id),
+                    ('user', '=', user.id),
+                ])
+                shipments.append(shipment_code)
+                products.append(int(v['product']))
+                locations.append(v['location'])
+            else:
+                cls.create_issue(shipment_code, v['status'],
+                    v['product'], v['qty'], v['location'])
+
+        if not shipments:
+            return
 
         shipments = dict((s.code, s) for s in ShipmentOut.search([
                 ('code', 'in', shipments),
@@ -542,6 +549,8 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
         to_create = []
         for shipment_code, v in pickings.iteritems():
+            if v['status'] != 'done':
+                continue
             product_id = int(v['product'])
             qty = Decimal(v['qty'])
 
@@ -560,3 +569,9 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
 
         if to_create:
             cls.create(to_create)
+
+    @classmethod
+    def create_issue(cls, shipment_code, status, product_id, quantity,
+            location):
+        '''Create an issue about a picking'''
+        pass
