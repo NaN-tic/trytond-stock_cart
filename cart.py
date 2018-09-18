@@ -512,14 +512,21 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         products = []
         locations = []
         for shipment_number, v in pickings.iteritems():
-            domain.append([
-                ('shipment.number', '=', shipment_number),
-                ('cart', '=', cart.id),
-                ('user', '=', user.id),
-            ])
-            shipments.append(shipment_number)
-            products.append(int(v['product']))
-            locations.append(v['location'])
+            if v['status'] == 'done':
+                domain.append([
+                    ('shipment.number', '=', shipment_number),
+                    ('cart', '=', cart.id),
+                    ('user', '=', user.id),
+                ])
+                shipments.append(shipment_number)
+                products.append(int(v['product']))
+                locations.append(v['location'])
+            else:
+                cls.create_issue(shipment_number, v['status'],
+                    v['product'], v['qty'], v['location'])
+
+        if not shipments:
+            return
 
         shipments = dict((s.number, s) for s in ShipmentOut.search([
                 ('number', 'in', shipments),
