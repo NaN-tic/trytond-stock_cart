@@ -354,7 +354,9 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 return cls.get_products_by_carts(carts)
 
             # Assign new shipments
-            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
+            shipments = Shipment.search(domain,
+                order=[('planned_date', 'ASC'), ('create_date', 'ASC')])
+
             shipments = cls.filter_shipments(shipments)
 
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
