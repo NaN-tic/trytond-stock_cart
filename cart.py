@@ -349,10 +349,11 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             if carts:
                 return cls.get_products_by_carts(carts)
 
-            shipments = Shipment.search(domain, order=[('planned_date', 'ASC')])
+            # Assign new shipments
+            shipments = Shipment.search(domain,
+                order=[('planned_date', 'ASC'), ('create_date', 'ASC')])
             shipments = cls.filter_shipments(shipments)
 
-            # Assign new shipments
             pickings = [{'id': s.id, 'sequence': s.carrier.sequence or 999
                 if hasattr(s, 'carrier') and s.carrier else 999} for s in shipments]
             shipments = [s['id'] for s in sorted(pickings, key=lambda k: k['sequence'])]
