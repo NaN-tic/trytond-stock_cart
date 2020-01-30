@@ -54,6 +54,10 @@ msgctxt "field:stock.cart,write_uid:"
 msgid "Write User"
 msgstr "Usuario de modificación"
 
+msgctxt "field:stock.configuration,stock_cart_create_issue:"
+msgid "Create Issue"
+msgstr "Crear incidencia"
+
 msgctxt "field:stock.inventory.line,picking_quantity:"
 msgid "Picking Quantity"
 msgstr "Cantidad picking"

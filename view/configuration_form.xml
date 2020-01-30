@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='shipment_internal_sequence']" position="after">
+        <label name="stock_cart_create_issue"/>
+        <field name="stock_cart_create_issue"/>
+    </xpath>
+</data>

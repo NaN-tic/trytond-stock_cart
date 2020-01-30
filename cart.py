@@ -506,12 +506,16 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         ShipmentOut = pool.get('stock.shipment.out')
         Product = pool.get('product.product')
         Location = pool.get('stock.location')
+        Configuration = pool.get('stock.configuration')
 
         user = User(Transaction().user)
         cart = user.cart if user.cart else None
 
         if not pickings or not cart:
             return
+
+        config = Configuration(1)
+        create_issue = config.stock_cart_create_issue or False
 
         domain = ['OR']
         shipments = []
@@ -527,7 +531,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
                 shipments.append(shipment_code)
                 products.append(int(v['product']))
                 locations.append(v['location'])
-            else:
+            elif create_issue:
                 cls.create_issue(shipment_code, v['status'],
                     v['product'], v['qty'], v['location'])
 
