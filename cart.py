@@ -155,7 +155,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             }
 
     @classmethod
-    def get_products_by_carts(cls, carts):
+    def get_products_by_carts(cls, carts, loc_ids=None, check_locations=True):
         '''
         Return a list of dictionaries like this:
         [{
@@ -178,25 +178,30 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         Location = Pool().get('stock.location')
         User = pool.get('res.user')
 
-        user = User(Transaction().user)
+        if check_locations:
+            user = User(Transaction().user)
 
-        if user.stock_locations:
-            locations = list(user.stock_locations)
-        elif user.stock_warehouse:
-            locations = [user.stock_warehouse.storage_location]
-        else:
-            locations = []
-            for warehouse in Location.search([
-                    ('type', '=', 'warehouse'),
-                    ]):
-                locations.append(warehouse.storage_location)
+            if user.stock_locations:
+                locations = list(user.stock_locations)
+            elif user.stock_warehouse:
+                locations = [user.stock_warehouse.storage_location]
+            else:
+                locations = []
+                for warehouse in Location.search([
+                        ('type', '=', 'warehouse'),
+                        ]):
+                    locations.append(warehouse.storage_location)
 
-        locs = Location.search([
-                ('parent', 'child_of', [l.id for l in locations]),
-                ])
-        if locs:
-            locations += locs
-        location_ids = [l.id for l in locations]
+            if not loc_ids:
+                locs = Location.search([
+                        ('parent', 'child_of', [l.id for l in locations]),
+                        ])
+                loc_ids = [l.id for l in locs] if locs else None
+                location_ids = [l.id for l in locations]
+                if loc_ids:
+                    location_ids += loc_ids
+            else:
+                location_ids = loc_ids
 
         products = []
         for cart in carts:
@@ -204,7 +209,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             for move in shipment.inventory_moves:
                 if move.state != 'assigned':
                     continue
-                if move.from_location.id not in location_ids:
+                if check_locations and move.from_location.id not in location_ids:
                     continue
 
                 # If location has not sequence, put it in the end
@@ -263,27 +268,24 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         pass
 
     @classmethod
-    def filter_domain_by_locations(cls, domain):
+    def filter_domain_by_locations(cls, domain, loc_ids=None):
         pool = Pool()
         User = pool.get('res.user')
         Location = pool.get('stock.location')
         Move = pool.get('stock.move')
 
-        user = User(Transaction().user)
-        locations = user.stock_locations
-        if locations:
+        if loc_ids:
             # search shipments are in user locations but not shipments
             # have other moves in others locations when user not have access
             # in locations preference
-            locs = Location.search([
-                    ('parent', 'child_of', [l.id for l in locations]),
-                    ])
             locs_notin = Location.search([
-                    ('id', 'not in', [l.id for l in locs]),
+                    #('id', 'not in', [l.id for l in locs]),
+                    ('id', 'not in', loc_ids),
                     ])
             moves_in = Move.search([
                     ('state', '=', 'assigned'),
-                    ('from_location', 'in', [l.id for l in locs]),
+                    #('from_location', 'in', [l.id for l in locs]),
+                    ('from_location', 'in', loc_ids),
                     ('shipment', 'like', 'stock.shipment.out,%'),
                     ])
             moves_notin = Move.search([
@@ -313,9 +315,13 @@ class StockShipmentOutCart(ModelSQL, ModelView):
         Shipment = pool.get('stock.shipment.out')
         Carts = pool.get('stock.shipment.out.cart')
         User = pool.get('res.user')
+        Location = pool.get('stock.location')
 
         transaction = Transaction()
+        cursor = transaction.cursor
         user = User(transaction.user)
+        locations = user.stock_locations
+        location_ids = [l.id for l in locations]
 
         if not user.cart:
             logger.warning(
@@ -323,13 +329,49 @@ class StockShipmentOutCart(ModelSQL, ModelView):
             return []
         baskets = user.cart.rows * user.cart.columns
 
-        if not domain:
-            domain = []
-        domain.append(('state', 'in', state))
-        if warehouse:
-            domain.append(('warehouse', '=', warehouse))
-        cls.filter_domain_by_locations(domain)
-        cls.append_domain(domain)
+        # if there are carts state draft, return first this carts
+        assigned_carts = Carts.search([
+            ('state', '=', 'draft'),
+            ('user', '=', user),
+            ], limit=baskets)
+
+        loc_ids = None
+        if not assigned_carts:
+            l = ','.join([str(l) for l in location_ids])
+            recursive_query = """
+                WITH RECURSIVE sublocations AS (
+                    SELECT
+                        id,
+                        parent,
+                        name
+                    FROM
+                        stock_location
+                    WHERE
+                        parent in (%s)
+                    UNION
+                        SELECT
+                            sl.id,
+                            sl.parent,
+                            sl.name
+                        FROM
+                            stock_location sl
+                        JOIN
+                            sublocations sbl ON sbl.id = sl.parent
+                )
+                SELECT id FROM sublocations group by id
+                UNION
+                    SELECT id FROM stock_location WHERE id IN (%s);
+                """ % (l, l)
+            cursor.execute(recursive_query)
+            loc_ids = [r[0] for r in cursor.fetchall()]
+
+            if not domain:
+                domain = []
+            domain.append(('state', 'in', state))
+            if warehouse:
+                domain.append(('warehouse', '=', warehouse))
+            cls.filter_domain_by_locations(domain, loc_ids=loc_ids)
+            cls.append_domain(domain)
 
         try:
             # Locks transaction. Nobody can query this table
@@ -345,17 +387,15 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                     'Table Carts is lock after %s attempts' % (total_attempts))
                 return []
         else:
-            # if there are carts state draft, return first this carts
-            carts = Carts.search([
-                ('state', '=', 'draft'),
-                ('user', '=', user),
-                ], limit=baskets)
-            if carts:
-                return cls.get_products_by_carts(carts)
+            if assigned_carts:
+                return cls.get_products_by_carts(assigned_carts, loc_ids=loc_ids, check_locations=False)
 
             # Assign new shipments
             shipments = Shipment.search(domain,
                 order=[('planned_date', 'ASC'), ('create_date', 'ASC')])
+
+            if not shipments:
+                return []
 
             shipments = cls.filter_shipments(shipments)
 
@@ -376,7 +416,7 @@ class StockShipmentOutCart(ModelSQL, ModelView):
                 to_create.append({'shipment': s})
             if to_create:
                 carts = Carts.create(to_create)
-                return cls.get_products_by_carts(carts)
+                return cls.get_products_by_carts(carts, loc_ids=loc_ids, check_locations=False)
         return []
 
     @classmethod
@@ -506,16 +546,12 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
         ShipmentOut = pool.get('stock.shipment.out')
         Product = pool.get('product.product')
         Location = pool.get('stock.location')
-        Configuration = pool.get('stock.configuration')
 
         user = User(Transaction().user)
         cart = user.cart if user.cart else None
 
         if not pickings or not cart:
             return
-
-        config = Configuration(1)
-        create_issue = config.stock_cart_create_issue or False
 
         domain = ['OR']
         shipments = []
@@ -531,7 +567,7 @@ class StockShipmentOutCartLine(ModelSQL, ModelView):
                 shipments.append(shipment_code)
                 products.append(int(v['product']))
                 locations.append(v['location'])
-            elif create_issue:
+            else:
                 cls.create_issue(shipment_code, v['status'],
                     v['product'], v['qty'], v['location'])
 
